@@ -1,5 +1,22 @@
-import { Text } from "react-native";
+import { Text, View } from "react-native";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../Navigation";
+import { NavigationBar } from "../NavigationBar";
+type NavigationRoute = NativeStackScreenProps<
+  RootStackParamList,
+  "DiscoverEvents"
+>;
 
-export const DiscoverEvents = () => {
-  return <Text>Discover Events</Text>;
+interface Props {
+  navigation: NavigationRoute["navigation"];
+  route: NavigationRoute["route"];
+}
+
+export const DiscoverEvents = (props: Props) => {
+  return (
+    <View>
+      <Text>Discover Events</Text>
+      <NavigationBar navigation={props.navigation} />
+    </View>
+  );
 };
