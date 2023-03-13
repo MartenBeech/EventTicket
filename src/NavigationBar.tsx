@@ -49,7 +49,7 @@ export const NavigationBar = (props: Props) => {
 
 const styles = StyleSheet.create({
   container: {
-    height: "10%",
+    height: "11%",
     flexDirection: "row",
   },
   button: {
