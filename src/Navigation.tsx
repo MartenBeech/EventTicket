@@ -1,6 +1,4 @@
 import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { NavigationBar } from "./NavigationBar";
 import { DiscoverEvents } from "./screens/DiscoverEvents";
 import { MyTickets } from "./screens/MyTickets";
 import { createStackNavigator } from "@react-navigation/stack";

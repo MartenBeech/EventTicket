@@ -12,25 +12,36 @@ interface Props {
 }
 
 export const NavigationBar = (props: Props) => {
+  const discoverEvents = "DiscoverEvents";
+  const myTickets = "MyTickets";
   const route = useRoute();
-  console.log(route);
   return (
     <View style={styles.container}>
       <Pressable
         style={{ ...styles.button, ...styles.buttonRightBorder }}
         onPress={() => {
-          props.navigation.navigate("DiscoverEvents");
+          props.navigation.navigate(discoverEvents);
         }}
       >
-        <Text style={styles.text}>Discover Events</Text>
+        <Text
+          style={
+            route.name === discoverEvents ? styles.textWhite : styles.textGray
+          }
+        >
+          Discover Events
+        </Text>
       </Pressable>
       <Pressable
         style={styles.button}
         onPress={() => {
-          props.navigation.navigate("MyTickets");
+          props.navigation.navigate(myTickets);
         }}
       >
-        <Text style={styles.text}>My Tickets</Text>
+        <Text
+          style={route.name === myTickets ? styles.textWhite : styles.textGray}
+        >
+          My Tickets
+        </Text>
       </Pressable>
     </View>
   );
@@ -38,7 +49,7 @@ export const NavigationBar = (props: Props) => {
 
 const styles = StyleSheet.create({
   container: {
-    height: 80,
+    height: "10%",
     flexDirection: "row",
   },
   button: {
@@ -51,7 +62,10 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderRightColor: "#FFFFFF",
   },
-  text: {
+  textWhite: {
     color: "#FFFFFF",
+  },
+  textGray: {
+    color: "#888888",
   },
 });
