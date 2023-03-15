@@ -1,6 +1,7 @@
 import { StyleSheet, View, Image, Text } from "react-native";
 
 interface Props {
+  id: number;
   title: string;
   date: string;
   location: string;
