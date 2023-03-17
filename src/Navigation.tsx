@@ -3,6 +3,7 @@ import { DiscoverEvents } from "./screens/DiscoverEvents";
 import { MyTickets } from "./screens/MyTickets";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Event } from "./screens/Event";
+import { View } from "react-native";
 
 export type RootStackParamList = {
   DiscoverEvents: undefined;
@@ -22,6 +23,9 @@ export const Navigation = () => {
           initialParams={undefined}
           options={{
             title: "",
+            headerLeft: () => {
+              return <View></View>;
+            },
           }}
         />
         <RootStack.Screen
@@ -30,6 +34,9 @@ export const Navigation = () => {
           initialParams={undefined}
           options={{
             title: "",
+            headerLeft: () => {
+              return <View></View>;
+            },
           }}
         />
         <RootStack.Screen
