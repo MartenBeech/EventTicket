@@ -4,6 +4,7 @@ import { MyTickets } from "./screens/MyTickets";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Event } from "./screens/Event";
 import { View } from "react-native";
+import { IdentifierModal } from "./components/IdentifierModal";
 
 export type RootStackParamList = {
   DiscoverEvents: undefined;
@@ -16,6 +17,7 @@ const RootStack = createStackNavigator<RootStackParamList>();
 export const Navigation = () => {
   return (
     <NavigationContainer>
+      <IdentifierModal></IdentifierModal>
       <RootStack.Navigator>
         <RootStack.Screen
           name="DiscoverEvents"

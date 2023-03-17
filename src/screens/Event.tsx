@@ -8,6 +8,8 @@ import {
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../Navigation";
+import { useEffect, useState } from "react";
+import { IPFSUrlPrefix } from "../../env";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "Event">;
 
 interface Props {
@@ -15,40 +17,56 @@ interface Props {
   route: NavigationRoute["route"];
 }
 
+interface Event {
+  location: string;
+  title: string;
+  startDate: string;
+  endDate: string;
+  imageCID: string;
+  description: string;
+  price: number;
+  creatorName: string;
+}
+
 export const Event = (props: Props) => {
-  const result = {
-    image: require("../images/Placeholder.jpg"),
-    title: "Kapsejladsen 2023: Det Officielle Afterparty!",
-    startDate: "FRIDAY, APRIL 28 2023 - 6 PM",
-    endDate: "SATURDAY, APRIL 29 2023 - 2 AM",
-    location: "Studenterhus Aarhus",
-    creator: "Mr. Studenter Hus",
-    description:
-      "𝐃𝐄𝐓 𝐎𝐅𝐅𝐈𝐂𝐈𝐄𝐋𝐋𝐄 𝐊𝐀𝐏𝐒𝐄𝐉𝐋𝐀𝐃𝐒 𝐀𝐅𝐓𝐄𝐑𝐏𝐀𝐑𝐓𝐘\n\nKampen om det gyldne bækken går ind den 28. april, og vi fejrer den 33. udgave af Nordeuropas største og suverænt fedeste studenterarrangement til KÆMPE afterparty i Studenterhus Aarhus!\n\nKom og fest med alle dine medstuderende, og giv den gas til livemusik på scenen og kolde, billige øl og drinks i godt vejr! Dørene åbner kl. 18.00 for alle med billet. Fra kl. 19:00 er det muligt at købe billet i døren, indtil kapaciteten er nået, så hvis du har købt en billet i forsalg, skal du sørge for at komme inden kl. 19:00.\n\nDu kan også støtte din lokale festforening ved at købe billet direkte hos dem, hvis netop din forening skal dyste til Kapsejladsen. Eventuel merchandise (hatte, trøjer etc.) gives kun ved køb igennem foreningen. Følg med på dit studie, eller tag fat i din lokale forening hvis du vil købe en billet igennem dem. Nederst kan du se en liste over de sejlende foreninger.\n\nFølg med her på eventet, hvor vi opdaterer programmet løbende.\n\nLINE-UP:\nTBA\n\n🚣 🎉 🔥 🚣 🎉 🔥 🚣 🎉 🔥 🚣 🎉 🔥",
-    price: 0,
-    ticketsLeft: 70,
-    ticketsSold: 30,
-  };
+  const [eventState, setEventState] = useState<Event>();
+
+  useEffect(() => {
+    const getIPFS = async () => {
+      const response = await window.fetch(
+        `${IPFSUrlPrefix}/QmP2YiCo1mag5z6tZez1Cu4YcuvSfJdgF6huv3euq5seWb`,
+        {
+          method: "GET",
+        }
+      );
+      const json = await response.json();
+      setEventState(json);
+    };
+    getIPFS();
+  }, []);
 
   return (
     <ScrollView>
-      <Image style={styles.image} source={result.image} />
+      <Image
+        style={styles.image}
+        source={{ uri: `${IPFSUrlPrefix}/${eventState?.imageCID}` }}
+      />
       <View style={styles.container}>
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>{result.title}</Text>
+          <Text style={styles.title}>{eventState?.title}</Text>
         </View>
         <View style={styles.infoContainer}>
-          <Text style={styles.info}>{result.startDate}</Text>
-          <Text style={styles.info}>{result.endDate}</Text>
-          <Text style={styles.info}>{result.location}</Text>
-          <Text style={styles.info}>{result.creator}</Text>
+          <Text style={styles.info}>{eventState?.startDate}</Text>
+          <Text style={styles.info}>{eventState?.endDate}</Text>
+          <Text style={styles.info}>{eventState?.location}</Text>
+          <Text style={styles.info}>{eventState?.creatorName}</Text>
         </View>
         <View style={styles.descriptionContainer}>
-          <Text style={styles.description}>{result.description}</Text>
+          <Text style={styles.description}>{eventState?.description}</Text>
         </View>
         <View style={styles.priceContainer}>
           <Text style={styles.price}>
-            Price: {result.price ? `${result.price} kr.` : "Free"}
+            Price: {eventState?.price ? `${eventState?.price} kr.` : "Free"}
           </Text>
         </View>
         <Pressable
@@ -58,12 +76,8 @@ export const Event = (props: Props) => {
           <Text style={styles.buyTicketText}>Buy Ticket</Text>
         </Pressable>
         <View style={styles.ticketsCounterContainer}>
-          <Text style={styles.ticketsCounter}>
-            {result.ticketsLeft} tickets left
-          </Text>
-          <Text style={styles.ticketsCounter}>
-            {result.ticketsSold} tickets sold
-          </Text>
+          <Text style={styles.ticketsCounter}>70 tickets left</Text>
+          <Text style={styles.ticketsCounter}>30 tickets sold</Text>
         </View>
       </View>
     </ScrollView>
