@@ -7,10 +7,8 @@ import {
   View,
   TextInput,
 } from "react-native";
-import {
-  firstTransaction,
-  generateAlgorandAccount,
-} from "../algorand/generateAccount";
+import { firstTransaction } from "../algorand/generateAccount";
+import { createTransaction } from "../rest/algorand";
 
 export const IdentifierModal = () => {
   const [modalVisible, setModalVisible] = useState(true);
@@ -38,7 +36,7 @@ export const IdentifierModal = () => {
           <Pressable
             style={styles.submitButton}
             onPress={() => {
-              firstTransaction();
+              createTransaction();
 
               // setModalVisible(!modalVisible);
             }}
@@ -89,7 +87,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 15,
     width: "50%",
-    height: 30,
+    height: 130,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#45c458",

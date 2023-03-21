@@ -5,31 +5,13 @@ import { getRandomBytes } from "expo-crypto";
 // import { algodClient } from "./algoclient";
 import axios from "axios";
 import { purestakeAPIKey, purestakeBaseServer } from "../../env";
-
-// Generate a new Algorand account keypair
-export const generateAlgorandAccount = (): {
-  address: string;
-  privateKey: Uint8Array;
-} => {
-  const privateKeyBytes = getRandomBytes(32);
-  const privateKey = new Uint8Array(privateKeyBytes);
-  const publicKey = nacl.box.keyPair.fromSecretKey(privateKey).publicKey;
-  const address = encodeAddress(publicKey);
-  return { address, privateKey };
-};
+import {
+  createAccount,
+  getAccount,
+  getTransactionParams,
+} from "../rest/algorand";
 
 export async function firstTransaction() {
-  const url = `${purestakeBaseServer}/v2/accounts/GQI6IPZE35BG7LXQJFHNJB4YTRSS2K46KZVL37TDBE4GNLOYE5FTXPMFH4`;
-  const headers = {
-    "X-API-key": purestakeAPIKey,
-    "Content-Type": "application/json",
-  };
-
-  console.log(url);
-  console.log(headers);
-  const response = await axios.get(url, { headers });
-  console.log(response.data);
-
   //   try {
   // const myAccount = {
   //   addr: "GQI6IPZE35BG7LXQJFHNJB4YTRSS2K46KZVL37TDBE4GNLOYE5FTXPMFH4",
