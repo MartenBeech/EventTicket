@@ -7,6 +7,10 @@ import {
   View,
   TextInput,
 } from "react-native";
+import {
+  firstTransaction,
+  generateAlgorandAccount,
+} from "../algorand/generateAccount";
 
 export const IdentifierModal = () => {
   const [modalVisible, setModalVisible] = useState(true);
@@ -34,14 +38,9 @@ export const IdentifierModal = () => {
           <Pressable
             style={styles.submitButton}
             onPress={() => {
-              //   const account = algosdk.generateAccount();
+              firstTransaction();
 
-              //   console.log(`Address: ${account.addr}`);
-              //   console.log(
-              //     `Mnemonic: ${algosdk.secretKeyToMnemonic(account.sk)}`
-              //   );
-
-              setModalVisible(!modalVisible);
+              // setModalVisible(!modalVisible);
             }}
           >
             <Text style={styles.submitText}>Submit</Text>

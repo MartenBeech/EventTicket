@@ -1,9 +1,10 @@
-// import algosdk from "algosdk";
+import algosdk from "algosdk";
+import { purestakeAPIKey, purestakeBaseServer } from "../../env";
 
-// const baseServer = "https://testnet-algorand.api.purestake.io/ps2";
-// const port = "";
-// const token = {
-//   "X-API-Key": "GCAE61OEML9V1hZKxCYf6EJBOGMHwvd15zmeM4Li",
-// };
+const baseServer = purestakeBaseServer;
+const port = "";
+const token = {
+  "X-API-Key": purestakeAPIKey,
+};
 
-// export const algodClient = new algosdk.Algodv2(token, baseServer, port);
+export const algodClient = new algosdk.Algodv2(token, baseServer, port);
