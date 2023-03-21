@@ -1,13 +1,22 @@
-import algosdk, { encodeAddress } from "algosdk";
+import algosdk, {
+  encodeAddress,
+  TransactionLike,
+  instantiateTxnIfNeeded,
+  EncodedSignedTransaction,
+  Transaction,
+  encodeObj,
+} from "algosdk";
 import axios from "axios";
 import { getRandomBytes } from "expo-crypto";
 import nacl from "tweetnacl";
 import {
   algorandAddress,
   algorandSecretKey,
+  algorandSigningKey,
   purestakeAPIKey,
   purestakeBaseServer,
 } from "../../env";
+import { Buffer } from "buffer";
 
 export const createAccount = async () => {
   const privateKeyBytes = getRandomBytes(32);
@@ -52,19 +61,51 @@ export const createTransaction = async () => {
     genesisHash: "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
   };
 
-  console.log(algorandSecretKey);
+  console.log(nacl.box.keyPair.fromSecretKey(algorandSecretKey).publicKey);
 
-  const signedTxn = algosdk.signTransaction(txn, algorandSecretKey);
-  const { data: txId } = await axios.post(
-    `${purestakeBaseServer}/v2/transactions`,
-    signedTxn.blob,
-    {
-      headers: {
-        "Content-Type": "application/x-binary",
-        "X-Algo-key": purestakeAPIKey,
-      },
+  const signedTxn = signTransaction(txn, algorandSigningKey);
+  try {
+    const { data: txId } = await axios.post(
+      `${purestakeBaseServer}/v2/transactions`,
+      signedTxn.blob,
+      {
+        headers: {
+          "Content-Type": "application/x-binary",
+          "X-API-key": purestakeAPIKey,
+        },
+      }
+    );
+    console.log(`Transaction sent: ${txId}`);
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      console.log("Axios request failed", err.response?.data, err.toJSON());
+    } else {
+      console.error(err);
     }
-  );
-
-  console.log(`Transaction sent: ${txId}`);
+  }
 };
+
+function signTransaction(txn: TransactionLike, sk: Uint8Array) {
+  const algoTxn = instantiateTxnIfNeeded(txn);
+  return {
+    txID: algoTxn.txID().toString(),
+    blob: signTxn(sk, algoTxn),
+  };
+}
+
+function signTxn(sk: Uint8Array, txn: Transaction) {
+  // construct signed message
+  const sTxn: EncodedSignedTransaction = {
+    sig: rawSignTxn(sk, txn),
+    txn: txn.get_obj_for_encoding(),
+  };
+  // add AuthAddr if signing with a different key than From indicates
+
+  return encodeObj(sTxn);
+}
+
+function rawSignTxn(sk: Uint8Array, txn: Transaction) {
+  const toBeSigned = txn.bytesToSign();
+  const sig = nacl.sign(toBeSigned, sk);
+  return Buffer.from(sig);
+}
