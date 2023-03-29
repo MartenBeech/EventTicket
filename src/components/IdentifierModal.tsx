@@ -9,15 +9,25 @@ import {
 } from "react-native";
 import { firstTransaction } from "../algorand/generateAccount";
 import { key_address, key_mnemonic, key_username } from "../constants";
-import { createAccount, createTransaction } from "../rest/algorand";
-import { getStoreValue, setStorePair } from "../rest/store";
+import {
+  applicationCallTransaction,
+  createAccount,
+  createTransaction,
+  optInAsset,
+} from "../rest/algorand";
+import { getStoreValue, setStorePair } from "../store";
 
 export const IdentifierModal = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [username, setUsername] = useState("");
 
   useEffect(() => {
-    getStoreValue(key_mnemonic).then((mnemonic) => setModalVisible(!mnemonic));
+    getStoreValue(key_mnemonic).then(async (mnemonic) => {
+      setModalVisible(!mnemonic);
+      console.log(mnemonic);
+      console.log(await getStoreValue(key_address));
+      applicationCallTransaction(168019755);
+    });
   }, []);
 
   return (
