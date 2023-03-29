@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Modal,
   StyleSheet,
@@ -8,11 +8,17 @@ import {
   TextInput,
 } from "react-native";
 import { firstTransaction } from "../algorand/generateAccount";
+import { key_address, key_mnemonic, key_username } from "../constants";
 import { createAccount, createTransaction } from "../rest/algorand";
+import { getStoreValue, setStorePair } from "../rest/store";
 
 export const IdentifierModal = () => {
-  const [modalVisible, setModalVisible] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
   const [username, setUsername] = useState("");
+
+  useEffect(() => {
+    getStoreValue(key_mnemonic).then((mnemonic) => setModalVisible(!mnemonic));
+  }, []);
 
   return (
     <Modal
@@ -36,12 +42,14 @@ export const IdentifierModal = () => {
           <Pressable
             style={styles.submitButton}
             onPress={async () => {
-              // const account = await createAccount();
-              // console.log(account);
+              if (username.length < 3 || username.length > 20) {
+                alert("Username has to be between 3-20 characters");
+              } else {
+                const account = await createAccount();
+                setStorePair(key_username, username);
 
-              createTransaction();
-
-              // setModalVisible(!modalVisible);
+                setModalVisible(false);
+              }
             }}
           >
             <Text style={styles.submitText}>Submit</Text>

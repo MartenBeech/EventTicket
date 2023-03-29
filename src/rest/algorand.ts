@@ -11,14 +11,16 @@ import {
   purestakeAPIKey,
   purestakeBaseServer,
 } from "../../env";
+import { key_address, key_mnemonic } from "../constants";
+import { getStoreValue, setStorePair } from "./store";
 
 export const createAccount = async () => {
   const privateKeyBytes = getRandomBytes(32);
   const privateKey = new Uint8Array(privateKeyBytes);
   const mnemonic = secretKeyToMnemonic(privateKey);
-  console.log(mnemonic);
   const account = algosdk.mnemonicToSecretKey(mnemonic);
-  console.log(account.addr);
+  await setStorePair(key_mnemonic, mnemonic);
+  await setStorePair(key_address, account.addr);
   return { mnemonic, addr: account.addr };
 };
 
