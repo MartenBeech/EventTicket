@@ -8,7 +8,7 @@ import {
   TextInput,
 } from "react-native";
 import { firstTransaction } from "../algorand/generateAccount";
-import { createTransaction } from "../rest/algorand";
+import { createAccount, createTransaction } from "../rest/algorand";
 
 export const IdentifierModal = () => {
   const [modalVisible, setModalVisible] = useState(true);
@@ -35,7 +35,10 @@ export const IdentifierModal = () => {
           />
           <Pressable
             style={styles.submitButton}
-            onPress={() => {
+            onPress={async () => {
+              // const account = await createAccount();
+              // console.log(account);
+
               createTransaction();
 
               // setModalVisible(!modalVisible);

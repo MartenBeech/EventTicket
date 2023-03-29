@@ -1,29 +1,25 @@
 import algosdk, {
-  encodeAddress,
   TransactionLike,
-  instantiateTxnIfNeeded,
-  EncodedSignedTransaction,
-  Transaction,
-  encodeObj,
+  secretKeyToMnemonic,
+  signTransaction,
 } from "algosdk";
 import axios from "axios";
 import { getRandomBytes } from "expo-crypto";
-import nacl from "tweetnacl";
 import {
   algorandAddress,
-  algorandSecretKey,
-  algorandSigningKey,
+  mnemonic,
   purestakeAPIKey,
   purestakeBaseServer,
 } from "../../env";
-import { Buffer } from "buffer";
 
 export const createAccount = async () => {
   const privateKeyBytes = getRandomBytes(32);
   const privateKey = new Uint8Array(privateKeyBytes);
-  const publicKey = nacl.box.keyPair.fromSecretKey(privateKey).publicKey;
-  const address = encodeAddress(publicKey);
-  return { address, privateKey };
+  const mnemonic = secretKeyToMnemonic(privateKey);
+  console.log(mnemonic);
+  const account = algosdk.mnemonicToSecretKey(mnemonic);
+  console.log(account.addr);
+  return { mnemonic, addr: account.addr };
 };
 
 export const getAccount = async () => {
@@ -37,7 +33,7 @@ export const getAccount = async () => {
   return response.data;
 };
 
-export const getTransactionParams = async () => {
+const getTransactionParams = async () => {
   const url = `${purestakeBaseServer}/v2/transactions/params`;
   const headers = {
     "X-API-key": purestakeAPIKey,
@@ -50,20 +46,22 @@ export const getTransactionParams = async () => {
 
 export const createTransaction = async () => {
   const transactionParams = await getTransactionParams();
-  const txn = {
+  console.log(transactionParams);
+  const txn: TransactionLike = {
+    flatFee: true,
     from: algorandAddress,
     to: "RQX6JUHQRR4X7442D7DQPWPFL2JGSX6KX3EXTIXLCPMJ7EZQLBAN5KQFIY",
     fee: transactionParams["min-fee"],
     amount: 2000000,
     firstRound: transactionParams["last-round"] + 1,
     lastRound: transactionParams["last-round"] + 1000,
-    genesisID: "testnet-v1.0",
-    genesisHash: "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
+    genesisID: transactionParams["genesis-id"],
+    genesisHash: transactionParams["genesis-hash"],
   };
 
-  console.log(nacl.box.keyPair.fromSecretKey(algorandSecretKey).publicKey);
+  const account = algosdk.mnemonicToSecretKey(mnemonic);
 
-  const signedTxn = signTransaction(txn, algorandSigningKey);
+  const signedTxn = signTransaction(txn, account.sk);
   try {
     const { data: txId } = await axios.post(
       `${purestakeBaseServer}/v2/transactions`,
@@ -75,7 +73,8 @@ export const createTransaction = async () => {
         },
       }
     );
-    console.log(`Transaction sent: ${txId}`);
+    console.log(`Transaction sent:`);
+    console.log(txId);
   } catch (err) {
     if (axios.isAxiosError(err)) {
       console.log("Axios request failed", err.response?.data, err.toJSON());
@@ -84,28 +83,3 @@ export const createTransaction = async () => {
     }
   }
 };
-
-function signTransaction(txn: TransactionLike, sk: Uint8Array) {
-  const algoTxn = instantiateTxnIfNeeded(txn);
-  return {
-    txID: algoTxn.txID().toString(),
-    blob: signTxn(sk, algoTxn),
-  };
-}
-
-function signTxn(sk: Uint8Array, txn: Transaction) {
-  // construct signed message
-  const sTxn: EncodedSignedTransaction = {
-    sig: rawSignTxn(sk, txn),
-    txn: txn.get_obj_for_encoding(),
-  };
-  // add AuthAddr if signing with a different key than From indicates
-
-  return encodeObj(sTxn);
-}
-
-function rawSignTxn(sk: Uint8Array, txn: Transaction) {
-  const toBeSigned = txn.bytesToSign();
-  const sig = nacl.sign(toBeSigned, sk);
-  return Buffer.from(sig);
-}
