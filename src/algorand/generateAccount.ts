@@ -5,11 +5,7 @@ import { getRandomBytes } from "expo-crypto";
 // import { algodClient } from "./algoclient";
 import axios from "axios";
 import { purestakeAPIKey, purestakeBaseServer } from "../../env";
-import {
-  createAccount,
-  getAccount,
-  getTransactionParams,
-} from "../rest/algorand";
+import { createAccount, getAccount } from "../rest/algorand";
 
 export async function firstTransaction() {
   //   try {

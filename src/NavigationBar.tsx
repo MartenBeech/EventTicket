@@ -1,6 +1,6 @@
 import { useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { StyleSheet, View, Text, Button, Pressable } from "react-native";
+import { StyleSheet, View, Text, Pressable } from "react-native";
 import { RootStackParamList } from "./Navigation";
 
 interface Props {
