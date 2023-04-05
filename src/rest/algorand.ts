@@ -100,8 +100,8 @@ export const optInAsset = async (assetId: number) => {
   const algorandAddress = (await getStoreValue(key_address)) as string;
   const mnemonic = (await getStoreValue(key_mnemonic)) as string;
 
-  const txn: any = {
-    type: "axfer",
+  const txn: TransactionLike = {
+    type: TransactionType.axfer,
     flatFee: true,
     from: algorandAddress,
     to: algorandAddress,
