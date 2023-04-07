@@ -8,7 +8,7 @@ import {
   TextInput,
 } from "react-native";
 import { key_address, key_mnemonic, key_username } from "../constants";
-import { applicationCallTransaction, createAccount } from "../rest/algorand";
+import { createAccount } from "../rest/algorand";
 import { getStoreValue, setStorePair } from "../store";
 
 export const IdentifierModal = () => {
@@ -20,7 +20,6 @@ export const IdentifierModal = () => {
       setModalVisible(!mnemonic);
       console.log(mnemonic);
       console.log(await getStoreValue(key_address));
-      applicationCallTransaction(168019755);
     });
   }, []);
 

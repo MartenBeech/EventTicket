@@ -12,6 +12,7 @@ import { appId, purestakeAPIKey, purestakeBaseServer } from "../../env";
 import { key_address, key_mnemonic } from "../constants";
 import { getStoreValue, setStorePair } from "../store";
 import { Buffer } from "buffer";
+import { sha512_256 } from "js-sha512";
 
 export const createAccount = async () => {
   const privateKeyBytes = getRandomBytes(32);
@@ -145,6 +146,12 @@ export const applicationCallTransaction = async (assetId: number) => {
   const algorandAddress = (await getStoreValue(key_address)) as string;
   const mnemonic = (await getStoreValue(key_mnemonic)) as string;
 
+  const hash = sha512_256("get_asset(asset)void");
+  const methodSelector = Buffer.from(hash.slice(0, 8), "hex");
+
+  const assetIndex = 0; // Since we have only one asset in the appForeignAssets array
+  const arg = algosdk.encodeUint64(assetIndex);
+
   const txn: AppNoOpTxn = {
     appIndex: appId,
     appOnComplete: OnApplicationComplete.NoOpOC,
@@ -157,10 +164,7 @@ export const applicationCallTransaction = async (assetId: number) => {
     lastRound: transactionParams["last-round"] + 1000,
     type: TransactionType.appl,
     appForeignAssets: [assetId],
-    appArgs: [
-      new Uint8Array(Buffer.from("get_assets")),
-      new Uint8Array(Buffer.from(algosdk.encodeUint64(assetId))),
-    ],
+    appArgs: [new Uint8Array(methodSelector), arg],
   };
 
   const account = algosdk.mnemonicToSecretKey(mnemonic);
