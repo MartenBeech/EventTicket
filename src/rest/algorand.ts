@@ -8,7 +8,12 @@ import algosdk, {
 } from "algosdk";
 import axios from "axios";
 import { getRandomBytes } from "expo-crypto";
-import { appId, purestakeAPIKey, purestakeBaseServer } from "../../env";
+import {
+  appId,
+  indexerUrl,
+  purestakeAPIKey,
+  purestakeBaseServer,
+} from "../../env";
 import { key_address, key_mnemonic } from "../constants";
 import { getStoreValue, setStorePair } from "../store";
 import { Buffer } from "buffer";
@@ -190,5 +195,29 @@ export const applicationCallTransaction = async (assetId: number) => {
       console.error(err);
     }
     return false;
+  }
+};
+
+export const getAssetsFromAccount = async (accountAddr: string) => {
+  try {
+    const { data: assets } = await axios.get(
+      `${indexerUrl}/accounts/${accountAddr}/assets`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("Assets fetched:");
+    console.log(assets);
+    return assets;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      console.log("Axios request failed", err.response?.data, err.toJSON());
+    } else {
+      console.error(err);
+    }
+    return undefined;
   }
 };
