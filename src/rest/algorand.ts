@@ -198,9 +198,17 @@ export const applicationCallTransaction = async (assetId: number) => {
   }
 };
 
-export const getAssetsFromAccount = async (accountAddr: string) => {
+interface Asset {
+  amount: number;
+  "asset-id": number;
+  deleted: boolean;
+  "is-frozen": boolean;
+  "opted-in-at-round": number;
+}
+
+export const getAssetIdsFromAccount = async (accountAddr: string) => {
   try {
-    const { data: assets } = await axios.get(
+    const response = await axios.get(
       `${indexerUrl}/accounts/${accountAddr}/assets`,
       {
         headers: {
@@ -208,16 +216,40 @@ export const getAssetsFromAccount = async (accountAddr: string) => {
         },
       }
     );
+    const assets: Asset[] = response.data.assets;
 
-    console.log("Assets fetched:");
-    console.log(assets);
-    return assets;
+    const assetIds = assets.map((asset) => {
+      return asset["asset-id"];
+    });
+    console.log(assetIds);
+    return assetIds;
   } catch (err) {
     if (axios.isAxiosError(err)) {
       console.log("Axios request failed", err.response?.data, err.toJSON());
     } else {
       console.error(err);
     }
-    return undefined;
+    return [];
+  }
+};
+
+export const getUrlFromAsset = async (assetId: number) => {
+  try {
+    const response = await axios.get(`${indexerUrl}/assets/${assetId}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const assetUrl: string = response.data.asset.params.url;
+
+    console.log(assetUrl);
+    return assetUrl;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      console.log("Axios request failed", err.response?.data, err.toJSON());
+    } else {
+      console.error(err);
+    }
+    return "";
   }
 };

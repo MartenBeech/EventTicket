@@ -1,7 +1,8 @@
 import { StyleSheet, View, Image, Text } from "react-native";
+import { IPFSUrlPrefix } from "../../env";
 
 interface Props {
-  id: number;
+  url: string;
   title: string;
   date: string;
   location: string;
@@ -12,7 +13,7 @@ export const EventBox = (props: Props) => {
     <View style={styles.container}>
       <Image
         style={styles.image}
-        source={require("../images/Placeholder.jpg")}
+        source={{ uri: `${IPFSUrlPrefix}/${props.url}` }}
       />
       <View style={styles.titleContainer}>
         <Text style={styles.title} numberOfLines={1}>

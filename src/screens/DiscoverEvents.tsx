@@ -1,8 +1,13 @@
-import { StyleSheet, View, ScrollView, Pressable } from "react-native";
+import { StyleSheet, View, ScrollView, Pressable, Button } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../Navigation";
 import { NavigationBar } from "../NavigationBar";
 import { EventBox } from "../components/EventBox";
+import { getAssetIdsFromAccount, getUrlFromAsset } from "../rest/algorand";
+import { smartContractAccountAddr } from "../../env";
+import { useEffect, useState } from "react";
+import { getIPFSEventData } from "../rest/ipfs";
+import { TicketEvent } from "../entities/event";
 type NavigationRoute = NativeStackScreenProps<
   RootStackParamList,
   "DiscoverEvents"
@@ -14,35 +19,51 @@ interface Props {
 }
 
 export const DiscoverEvents = (props: Props) => {
+  const [events, setEvents] = useState<TicketEvent[]>([]);
+
+  useEffect(() => {
+    console.log("Hejsa frede");
+    const getAssetUrlsFromAccount = async () => {
+      const assetIds = await getAssetIdsFromAccount(smartContractAccountAddr);
+      const urls = await Promise.all(
+        assetIds.map((assetId) => {
+          return getUrlFromAsset(assetId);
+        })
+      );
+      const fakeUrls = [
+        "QmP2YiCo1mag5z6tZez1Cu4YcuvSfJdgF6huv3euq5seWb", //Hardcoded
+        ...urls,
+      ];
+      const events = await Promise.all(
+        fakeUrls.map((url) => {
+          return getIPFSEventData(url);
+        })
+      );
+      setEvents(events);
+    };
+    getAssetUrlsFromAccount();
+  }, []);
+
   return (
     <View style={styles.screen}>
       <ScrollView>
         <View style={styles.container}>
-          <Pressable
-            style={styles.button}
-            onPress={() => {
-              props.navigation.navigate("Event", { id: 1 });
-            }}
-          >
-            <EventBox
-              id={1}
-              title="Kapsejladsen 2023: Det Officielle Afterparty!"
-              date="FRIDAY, APRIL 28 2023 - 6 PM"
-              location="Studenterhus Aarhus"
-            />
-          </Pressable>
-          <EventBox
-            id={2}
-            title="Stella Polaris Aarhus"
-            date="SATURDAY, JULY 29 2023 - 12 PM"
-            location="Vennelystparken"
-          />
-          <EventBox
-            id={3}
-            title="Brazil Beats - Spring Party - Dj Roni"
-            date="FRIDAY, APRIL 21 2023 - 10 PM"
-            location="CasaV58"
-          />
+          {events.map((ticketEvent, index) => (
+            <Pressable
+              key={`${ticketEvent.title}-${index}`}
+              style={styles.button}
+              onPress={() => {
+                props.navigation.navigate("Event", { ticketEvent });
+              }}
+            >
+              <EventBox
+                url={ticketEvent.imageCID}
+                title={ticketEvent.title}
+                date={ticketEvent.startDate}
+                location={ticketEvent.location}
+              />
+            </Pressable>
+          ))}
         </View>
       </ScrollView>
       <NavigationBar navigation={props.navigation} />

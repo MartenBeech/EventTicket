@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../Navigation";
-import { useEffect, useState } from "react";
 import { IPFSUrlPrefix } from "../../env";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "Event">;
 
@@ -17,56 +16,31 @@ interface Props {
   route: NavigationRoute["route"];
 }
 
-interface Event {
-  location: string;
-  title: string;
-  startDate: string;
-  endDate: string;
-  imageCID: string;
-  description: string;
-  price: number;
-  creatorName: string;
-}
-
 export const Event = (props: Props) => {
-  const [eventState, setEventState] = useState<Event>();
-
-  useEffect(() => {
-    const getIPFS = async () => {
-      const response = await window.fetch(
-        `${IPFSUrlPrefix}/QmP2YiCo1mag5z6tZez1Cu4YcuvSfJdgF6huv3euq5seWb`,
-        {
-          method: "GET",
-        }
-      );
-      const json = await response.json();
-      setEventState(json);
-    };
-    getIPFS();
-  }, []);
+  const ticketEvent = props.route.params.ticketEvent;
 
   return (
     <ScrollView>
       <Image
         style={styles.image}
-        source={{ uri: `${IPFSUrlPrefix}/${eventState?.imageCID}` }}
+        source={{ uri: `${IPFSUrlPrefix}/${ticketEvent.imageCID}` }}
       />
       <View style={styles.container}>
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>{eventState?.title}</Text>
+          <Text style={styles.title}>{ticketEvent.title}</Text>
         </View>
         <View style={styles.infoContainer}>
-          <Text style={styles.info}>{eventState?.startDate}</Text>
-          <Text style={styles.info}>{eventState?.endDate}</Text>
-          <Text style={styles.info}>{eventState?.location}</Text>
-          <Text style={styles.info}>{eventState?.creatorName}</Text>
+          <Text style={styles.info}>{ticketEvent.startDate}</Text>
+          <Text style={styles.info}>{ticketEvent.endDate}</Text>
+          <Text style={styles.info}>{ticketEvent.location}</Text>
+          <Text style={styles.info}>{ticketEvent.creatorName}</Text>
         </View>
         <View style={styles.descriptionContainer}>
-          <Text style={styles.description}>{eventState?.description}</Text>
+          <Text style={styles.description}>{ticketEvent.description}</Text>
         </View>
         <View style={styles.priceContainer}>
           <Text style={styles.price}>
-            Price: {eventState?.price ? `${eventState?.price} kr.` : "Free"}
+            Price: {ticketEvent.price ? `${ticketEvent.price} kr.` : "Free"}
           </Text>
         </View>
         <Pressable
