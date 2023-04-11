@@ -14,7 +14,7 @@ import {
   getTotalFromAsset,
 } from "../../rest/algorand";
 import { useEffect, useState } from "react";
-import { VerifyTicket } from "./VerifyTicket";
+import { VerifyTicket } from "../../components/VerifyTicketModal";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "Ticket">;
 
 interface Props {
