@@ -206,7 +206,7 @@ interface Asset {
   "opted-in-at-round": number;
 }
 
-export const getAssetIdsFromAccount = async (accountAddr: string) => {
+const getAssetDataFromAccount = async (accountAddr: string) => {
   try {
     const response = await axios.get(
       `${indexerUrl}/accounts/${accountAddr}/assets`,
@@ -218,11 +218,7 @@ export const getAssetIdsFromAccount = async (accountAddr: string) => {
     );
     const assets: Asset[] = response.data.assets;
 
-    const assetIds = assets.map((asset) => {
-      return asset["asset-id"];
-    });
-    console.log(assetIds);
-    return assetIds;
+    return assets;
   } catch (err) {
     if (axios.isAxiosError(err)) {
       console.log("Axios request failed", err.response?.data, err.toJSON());
@@ -233,17 +229,35 @@ export const getAssetIdsFromAccount = async (accountAddr: string) => {
   }
 };
 
-export const getUrlFromAsset = async (assetId: number) => {
+export const getAssetIdsFromAccount = async (accountAddr: string) => {
+  const assets = await getAssetDataFromAccount(accountAddr);
+  const assetIds = assets.map((asset) => {
+    return asset["asset-id"];
+  });
+  return assetIds;
+};
+
+export const getAssetAmountFromAccount = async (
+  accountAddr: string,
+  assetId: number
+) => {
+  const assets = await getAssetDataFromAccount(accountAddr);
+
+  const asset = assets.find((asset) => asset["asset-id"] === assetId);
+  if (asset) {
+    return asset.amount;
+  }
+  return -1;
+};
+
+const getAssetParams = async (assetId: number) => {
   try {
     const response = await axios.get(`${indexerUrl}/assets/${assetId}`, {
       headers: {
         "Content-Type": "application/json",
       },
     });
-    const assetUrl: string = response.data.asset.params.url;
-
-    console.log(assetUrl);
-    return assetUrl;
+    return response.data.asset.params;
   } catch (err) {
     if (axios.isAxiosError(err)) {
       console.log("Axios request failed", err.response?.data, err.toJSON());
@@ -252,4 +266,20 @@ export const getUrlFromAsset = async (assetId: number) => {
     }
     return "";
   }
+};
+
+export const getUrlFromAsset = async (assetId: number): Promise<string> => {
+  const assetParams = await getAssetParams(assetId);
+  if (assetParams) {
+    return assetParams.url;
+  }
+  return "";
+};
+
+export const getTotalFromAsset = async (assetId: number): Promise<number> => {
+  const assetParams = await getAssetParams(assetId);
+  if (assetParams) {
+    return assetParams.total;
+  }
+  return -1;
 };

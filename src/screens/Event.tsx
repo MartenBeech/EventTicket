@@ -8,8 +8,14 @@ import {
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../Navigation";
-import { IPFSUrlPrefix } from "../../env";
-import { buyAssetTransaction, optInAsset } from "../rest/algorand";
+import { IPFSUrlPrefix, smartContractAccountAddr } from "../../env";
+import {
+  buyAssetTransaction,
+  getAssetAmountFromAccount,
+  getTotalFromAsset,
+  optInAsset,
+} from "../rest/algorand";
+import { useEffect, useState } from "react";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "Event">;
 
 interface Props {
@@ -20,6 +26,23 @@ interface Props {
 export const Event = (props: Props) => {
   const ticketEventAssetId = props.route.params.ticketEventAssetId;
   const ticketEvent = ticketEventAssetId.ticketEvent;
+
+  const [ticketsLeft, setTicketsLeft] = useState(0);
+  const [ticketsSold, setTicketsSold] = useState(0);
+
+  useEffect(() => {
+    const getTicketAmounts = async () => {
+      const totalAmount = await getTotalFromAsset(ticketEventAssetId.assetId);
+      const assetAmount = await getAssetAmountFromAccount(
+        smartContractAccountAddr,
+        ticketEventAssetId.assetId
+      );
+
+      setTicketsLeft(assetAmount);
+      setTicketsSold(totalAmount - assetAmount);
+    };
+    getTicketAmounts();
+  }, []);
 
   return (
     <ScrollView>
@@ -55,8 +78,8 @@ export const Event = (props: Props) => {
           <Text style={styles.buyTicketText}>Buy Ticket</Text>
         </Pressable>
         <View style={styles.ticketsCounterContainer}>
-          <Text style={styles.ticketsCounter}>70 tickets left</Text>
-          <Text style={styles.ticketsCounter}>30 tickets sold</Text>
+          <Text style={styles.ticketsCounter}>{ticketsLeft} tickets left</Text>
+          <Text style={styles.ticketsCounter}>{ticketsSold} tickets sold</Text>
         </View>
       </View>
     </ScrollView>

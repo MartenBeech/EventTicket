@@ -59,7 +59,7 @@ export const DiscoverEvents = (props: Props) => {
                 }}
               >
                 <EventBox
-                  url={`/${ticketEvent.imageUrl}`}
+                  url={`${ticketEvent.imageUrl}`}
                   title={ticketEvent.title}
                   date={ticketEvent.startDate}
                   location={ticketEvent.location}
