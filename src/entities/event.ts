@@ -3,8 +3,13 @@ export interface TicketEvent {
   title: string;
   startDate: string;
   endDate: string;
-  imageCID: string;
+  imageUrl: string;
   description: string;
   price: number;
   creatorName: string;
+}
+
+export interface TicketEventAssetId {
+  ticketEvent: TicketEvent;
+  assetId: number;
 }

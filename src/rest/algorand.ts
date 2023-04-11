@@ -31,7 +31,7 @@ export const createAccount = async () => {
 
 export const getAccount = async () => {
   const algorandAddress = getStoreValue(key_address);
-  const url = `${purestakeBaseServer}/v2/accounts/${algorandAddress}`;
+  const url = `${purestakeBaseServer}/accounts/${algorandAddress}`;
   const headers = {
     "X-API-key": purestakeAPIKey,
     "Content-Type": "application/json",
@@ -42,7 +42,7 @@ export const getAccount = async () => {
 };
 
 const getTransactionParams = async () => {
-  const url = `${purestakeBaseServer}/v2/transactions/params`;
+  const url = `${purestakeBaseServer}/transactions/params`;
   const headers = {
     "X-API-key": purestakeAPIKey,
     "Content-Type": "application/json",
@@ -79,7 +79,7 @@ export const createTransaction = async (props: CreateTransactionProps) => {
   const signedTxn = signTransaction(txn, account.sk);
   try {
     const { data: txId } = await axios.post(
-      `${purestakeBaseServer}/v2/transactions`,
+      `${purestakeBaseServer}/transactions`,
       signedTxn.blob,
       {
         headers: {
@@ -124,7 +124,7 @@ export const optInAsset = async (assetId: number) => {
   const signedTxn = algosdk.signTransaction(txn, account.sk);
   try {
     const { data: txId } = await axios.post(
-      `${purestakeBaseServer}/v2/transactions`,
+      `${purestakeBaseServer}/transactions`,
       signedTxn.blob,
       {
         headers: {
@@ -146,7 +146,7 @@ export const optInAsset = async (assetId: number) => {
   }
 };
 
-export const applicationCallTransaction = async (assetId: number) => {
+export const buyAssetTransaction = async (assetId: number) => {
   const transactionParams = await getTransactionParams();
   const algorandAddress = (await getStoreValue(key_address)) as string;
   const mnemonic = (await getStoreValue(key_mnemonic)) as string;
@@ -176,7 +176,7 @@ export const applicationCallTransaction = async (assetId: number) => {
   const signedTxn = algosdk.signTransaction(txn, account.sk);
   try {
     const { data: txId } = await axios.post(
-      `${purestakeBaseServer}/v2/transactions`,
+      `${purestakeBaseServer}/transactions`,
       signedTxn.blob,
       {
         headers: {

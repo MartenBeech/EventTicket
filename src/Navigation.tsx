@@ -5,12 +5,12 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Event } from "./screens/Event";
 import { View } from "react-native";
 import { IdentifierModal } from "./components/IdentifierModal";
-import { TicketEvent } from "./entities/event";
+import { TicketEventAssetId } from "./entities/event";
 
 export type RootStackParamList = {
   DiscoverEvents: undefined;
   MyTickets: undefined;
-  Event: { ticketEvent: TicketEvent };
+  Event: { ticketEventAssetId: TicketEventAssetId };
 };
 
 const RootStack = createStackNavigator<RootStackParamList>();
@@ -46,15 +46,18 @@ export const Navigation = () => {
           name="Event"
           component={Event}
           initialParams={{
-            ticketEvent: {
-              creatorName: "",
-              description: "",
-              endDate: "",
-              imageCID: "",
-              location: "",
-              price: 0,
-              startDate: "",
-              title: "",
+            ticketEventAssetId: {
+              ticketEvent: {
+                creatorName: "",
+                description: "",
+                endDate: "",
+                imageUrl: "",
+                location: "",
+                price: 0,
+                startDate: "",
+                title: "",
+              },
+              assetId: 0,
             },
           }}
           options={{

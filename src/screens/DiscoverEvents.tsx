@@ -1,4 +1,4 @@
-import { StyleSheet, View, ScrollView, Pressable, Button } from "react-native";
+import { StyleSheet, View, ScrollView, Pressable } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../Navigation";
 import { NavigationBar } from "../NavigationBar";
@@ -7,7 +7,7 @@ import { getAssetIdsFromAccount, getUrlFromAsset } from "../rest/algorand";
 import { smartContractAccountAddr } from "../../env";
 import { useEffect, useState } from "react";
 import { getIPFSEventData } from "../rest/ipfs";
-import { TicketEvent } from "../entities/event";
+import { TicketEventAssetId } from "../entities/event";
 type NavigationRoute = NativeStackScreenProps<
   RootStackParamList,
   "DiscoverEvents"
@@ -19,24 +19,22 @@ interface Props {
 }
 
 export const DiscoverEvents = (props: Props) => {
-  const [events, setEvents] = useState<TicketEvent[]>([]);
+  const [events, setEvents] = useState<TicketEventAssetId[]>([]);
 
   useEffect(() => {
-    console.log("Hejsa frede");
     const getAssetUrlsFromAccount = async () => {
       const assetIds = await getAssetIdsFromAccount(smartContractAccountAddr);
-      const urls = await Promise.all(
-        assetIds.map((assetId) => {
-          return getUrlFromAsset(assetId);
+      const assets = await Promise.all(
+        assetIds.map(async (assetId) => {
+          return { url: await getUrlFromAsset(assetId), id: assetId };
         })
       );
-      const fakeUrls = [
-        "QmP2YiCo1mag5z6tZez1Cu4YcuvSfJdgF6huv3euq5seWb", //Hardcoded
-        ...urls,
-      ];
       const events = await Promise.all(
-        fakeUrls.map((url) => {
-          return getIPFSEventData(url);
+        assets.map(async (asset) => {
+          return {
+            ticketEvent: await getIPFSEventData(asset.url),
+            assetId: asset.id,
+          };
         })
       );
       setEvents(events);
@@ -48,22 +46,27 @@ export const DiscoverEvents = (props: Props) => {
     <View style={styles.screen}>
       <ScrollView>
         <View style={styles.container}>
-          {events.map((ticketEvent, index) => (
-            <Pressable
-              key={`${ticketEvent.title}-${index}`}
-              style={styles.button}
-              onPress={() => {
-                props.navigation.navigate("Event", { ticketEvent });
-              }}
-            >
-              <EventBox
-                url={ticketEvent.imageCID}
-                title={ticketEvent.title}
-                date={ticketEvent.startDate}
-                location={ticketEvent.location}
-              />
-            </Pressable>
-          ))}
+          {events.map((event, index) => {
+            const ticketEvent = event.ticketEvent;
+            return (
+              <Pressable
+                key={`${ticketEvent.title}-${index}`}
+                style={styles.button}
+                onPress={() => {
+                  props.navigation.navigate("Event", {
+                    ticketEventAssetId: { ticketEvent, assetId: event.assetId },
+                  });
+                }}
+              >
+                <EventBox
+                  url={`/${ticketEvent.imageUrl}`}
+                  title={ticketEvent.title}
+                  date={ticketEvent.startDate}
+                  location={ticketEvent.location}
+                />
+              </Pressable>
+            );
+          })}
         </View>
       </ScrollView>
       <NavigationBar navigation={props.navigation} />

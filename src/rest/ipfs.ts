@@ -7,7 +7,7 @@ export const getIPFSEventData = async (url: string) => {
     creatorName: "",
     description: "",
     endDate: "",
-    imageCID: "",
+    imageUrl: "",
     location: "",
     price: 0,
     startDate: "",

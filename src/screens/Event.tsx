@@ -9,6 +9,7 @@ import {
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../Navigation";
 import { IPFSUrlPrefix } from "../../env";
+import { buyAssetTransaction, optInAsset } from "../rest/algorand";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "Event">;
 
 interface Props {
@@ -17,13 +18,14 @@ interface Props {
 }
 
 export const Event = (props: Props) => {
-  const ticketEvent = props.route.params.ticketEvent;
+  const ticketEventAssetId = props.route.params.ticketEventAssetId;
+  const ticketEvent = ticketEventAssetId.ticketEvent;
 
   return (
     <ScrollView>
       <Image
         style={styles.image}
-        source={{ uri: `${IPFSUrlPrefix}/${ticketEvent.imageCID}` }}
+        source={{ uri: `${IPFSUrlPrefix}/${ticketEvent.imageUrl}` }}
       />
       <View style={styles.container}>
         <View style={styles.titleContainer}>
@@ -45,7 +47,10 @@ export const Event = (props: Props) => {
         </View>
         <Pressable
           style={styles.buyTicketButton}
-          onPress={() => alert("Ticket Bought!")}
+          onPress={async () => {
+            await optInAsset(ticketEventAssetId.assetId);
+            await buyAssetTransaction(ticketEventAssetId.assetId);
+          }}
         >
           <Text style={styles.buyTicketText}>Buy Ticket</Text>
         </Pressable>
