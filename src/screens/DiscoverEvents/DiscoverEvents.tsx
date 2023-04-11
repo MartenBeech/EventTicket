@@ -1,13 +1,13 @@
 import { StyleSheet, View, ScrollView, Pressable } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../Navigation";
-import { NavigationBar } from "../NavigationBar";
-import { EventBox } from "../components/EventBox";
-import { getAssetIdsFromAccount, getUrlFromAsset } from "../rest/algorand";
-import { smartContractAccountAddr } from "../../env";
+import { RootStackParamList } from "../../Navigation";
+import { NavigationBar } from "../../NavigationBar";
+import { EventBox } from "../../components/EventBox";
+import { getAssetIdsFromAccount, getUrlFromAsset } from "../../rest/algorand";
+import { smartContractAccountAddr } from "../../../env";
 import { useEffect, useState } from "react";
-import { getIPFSEventData } from "../rest/ipfs";
-import { TicketEventAssetId } from "../entities/event";
+import { getIPFSEventData } from "../../rest/ipfs";
+import { TicketEventAssetId } from "../../entities/event";
 type NavigationRoute = NativeStackScreenProps<
   RootStackParamList,
   "DiscoverEvents"

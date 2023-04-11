@@ -7,28 +7,28 @@ import {
   Pressable,
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../Navigation";
-import { IPFSUrlPrefix, smartContractAccountAddr } from "../../env";
+import { RootStackParamList } from "../../Navigation";
+import { IPFSUrlPrefix, smartContractAccountAddr } from "../../../env";
 import {
-  buyAssetTransaction,
   getAssetAmountFromAccount,
   getTotalFromAsset,
-  optInAsset,
-} from "../rest/algorand";
+} from "../../rest/algorand";
 import { useEffect, useState } from "react";
-type NavigationRoute = NativeStackScreenProps<RootStackParamList, "Event">;
+import { VerifyTicket } from "./VerifyTicket";
+type NavigationRoute = NativeStackScreenProps<RootStackParamList, "Ticket">;
 
 interface Props {
   navigation: NavigationRoute["navigation"];
   route: NavigationRoute["route"];
 }
 
-export const Event = (props: Props) => {
-  const ticketEventAssetId = props.route.params.ticketEventAssetId;
-  const ticketEvent = ticketEventAssetId.ticketEvent;
-
+export const Ticket = (props: Props) => {
   const [ticketsLeft, setTicketsLeft] = useState(0);
   const [ticketsSold, setTicketsSold] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const ticketEventAssetId = props.route.params.ticketEventAssetId;
+  const ticketEvent = ticketEventAssetId.ticketEvent;
 
   useEffect(() => {
     const getTicketAmounts = async () => {
@@ -46,6 +46,8 @@ export const Event = (props: Props) => {
 
   return (
     <ScrollView>
+      {modalVisible && <VerifyTicket setModalVisible={setModalVisible} />}
+
       <Image
         style={styles.image}
         source={{ uri: `${IPFSUrlPrefix}/${ticketEvent.imageUrl}` }}
@@ -71,11 +73,10 @@ export const Event = (props: Props) => {
         <Pressable
           style={styles.buyTicketButton}
           onPress={async () => {
-            await optInAsset(ticketEventAssetId.assetId);
-            await buyAssetTransaction(ticketEventAssetId.assetId);
+            setModalVisible(true);
           }}
         >
-          <Text style={styles.buyTicketText}>Buy Ticket</Text>
+          <Text style={styles.buyTicketText}>Verify Ticket</Text>
         </Pressable>
         <View style={styles.ticketsCounterContainer}>
           <Text style={styles.ticketsCounter}>{ticketsLeft} tickets left</Text>
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
   buyTicketButton: {
     height: 50,
     width: "100%",
-    backgroundColor: "#5955FF",
+    backgroundColor: "#0D8200",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 15,
