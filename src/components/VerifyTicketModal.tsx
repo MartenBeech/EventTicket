@@ -2,16 +2,28 @@ import {
   StyleSheet,
   Modal,
   View,
-  Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
+import { QrComponent } from "./QrComponent";
+import { getStoreValue } from "../store";
+import { key_address } from "../constants";
+import { useEffect, useState } from "react";
 
 interface Props {
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const VerifyTicket = (props: Props) => {
+  const [keyAddress, setKeyAddress] = useState("");
+  useEffect(() => {
+    const getKeyAddress = async () => {
+      const keyAddress = (await getStoreValue(key_address)) as string;
+      setKeyAddress(keyAddress);
+    };
+    getKeyAddress();
+  }, []);
+
   return (
     <Modal
       animationType="slide"
@@ -30,8 +42,8 @@ export const VerifyTicket = (props: Props) => {
       >
         <View style={styles.centeredView}>
           <TouchableWithoutFeedback>
-            <View style={styles.container}>
-              <Text>Hello World</Text>
+            <View>
+              {keyAddress && <QrComponent accountAddr={keyAddress} />}
             </View>
           </TouchableWithoutFeedback>
         </View>
