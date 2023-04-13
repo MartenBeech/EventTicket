@@ -7,7 +7,7 @@ import {
   View,
   TextInput,
 } from "react-native";
-import { key_address, key_mnemonic, key_username } from "../constants";
+import { key_mnemonic, key_username } from "../constants";
 import { createAccount } from "../rest/algorand";
 import { getStoreValue, setStorePair } from "../store";
 
@@ -18,8 +18,6 @@ export const IdentifierModal = () => {
   useEffect(() => {
     getStoreValue(key_mnemonic).then(async (mnemonic) => {
       setModalVisible(!mnemonic);
-      console.log(mnemonic);
-      console.log(await getStoreValue(key_address));
     });
   }, []);
 

@@ -13,7 +13,6 @@ export const QrComponent = (props: SignedMessage) => {
     signature,
   };
   const jsonString = JSON.stringify(signedMessage);
-  console.log(jsonString);
   return (
     <View style={styles.container}>
       <QRCode value={jsonString} size={200} />
