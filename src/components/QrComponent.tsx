@@ -1,14 +1,22 @@
 import { View, StyleSheet } from "react-native";
 import QRCode from "react-native-qrcode-svg";
+import { SignedMessage } from "../entities/signedMessage";
 
-interface Props {
-  accountAddr: string;
-}
+export const QrComponent = (props: SignedMessage) => {
+  const message = Array.from(props.message);
+  const publicKey = props.publicKey;
+  const signature = Array.from(props.signature);
 
-export const QrComponent = (props: Props) => {
+  const signedMessage = {
+    message,
+    publicKey,
+    signature,
+  };
+  const jsonString = JSON.stringify(signedMessage);
+  console.log(jsonString);
   return (
     <View style={styles.container}>
-      <QRCode value={props.accountAddr} size={200} />
+      <QRCode value={jsonString} size={200} />
     </View>
   );
 };
@@ -19,12 +27,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff",
     padding: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 2,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
   },
 });

@@ -7,19 +7,30 @@ import {
 } from "react-native";
 import { QrComponent } from "./QrComponent";
 import { getStoreValue } from "../store";
-import { key_address } from "../constants";
+import { key_address, key_mnemonic } from "../constants";
 import { useEffect, useState } from "react";
+import { signMessage } from "../algorand/signMessage";
+import { SignedMessage } from "../entities/signedMessage";
 
 interface Props {
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const VerifyTicket = (props: Props) => {
-  const [keyAddress, setKeyAddress] = useState("");
+  const [signedMessage, setSignedMessage] = useState<SignedMessage>({
+    message: new Uint8Array(),
+    publicKey: "",
+    signature: new Uint8Array(),
+  });
   useEffect(() => {
     const getKeyAddress = async () => {
       const keyAddress = (await getStoreValue(key_address)) as string;
-      setKeyAddress(keyAddress);
+      const mnemonic = (await getStoreValue(key_mnemonic)) as string;
+      const signedMessage = signMessage({
+        publicKey: keyAddress,
+        mnemonic: mnemonic,
+      });
+      setSignedMessage(signedMessage);
     };
     getKeyAddress();
   }, []);
@@ -43,7 +54,7 @@ export const VerifyTicket = (props: Props) => {
         <View style={styles.centeredView}>
           <TouchableWithoutFeedback>
             <View>
-              {keyAddress && <QrComponent accountAddr={keyAddress} />}
+              {signedMessage.publicKey && <QrComponent {...signedMessage} />}
             </View>
           </TouchableWithoutFeedback>
         </View>
@@ -56,6 +67,7 @@ const styles = StyleSheet.create({
   screen: {
     width: "100%",
     height: "100%",
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   centeredView: {
     flex: 1,
