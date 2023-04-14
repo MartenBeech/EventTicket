@@ -1,9 +1,9 @@
 import { NavigationContainer } from "@react-navigation/native";
-import { DiscoverEvents } from "./screens/DiscoverEvents/DiscoverEvents";
-import { MyTickets } from "./screens/MyTickets/MyTickets";
+import { DiscoverEvents } from "./screens/discoverEvents/DiscoverEvents";
+import { MyTickets } from "./screens/myTickets/MyTickets";
 import { createStackNavigator } from "@react-navigation/stack";
-import { Event } from "./screens/DiscoverEvents/Event";
-import { Ticket } from "./screens/MyTickets/Ticket";
+import { Event } from "./screens/discoverEvents/Event";
+import { Ticket } from "./screens/myTickets/Ticket";
 import { View } from "react-native";
 import { IdentifierModal } from "./components/IdentifierModal";
 import { TicketEventAssetId } from "./entities/event";
