@@ -20,7 +20,7 @@ const RootStack = createStackNavigator<RootStackParamList>();
 export const Navigation = () => {
   return (
     <NavigationContainer>
-      <IdentifierModal></IdentifierModal>
+      <IdentifierModal />
       <RootStack.Navigator>
         <RootStack.Screen
           name="DiscoverEvents"

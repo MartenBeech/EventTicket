@@ -21,7 +21,7 @@ export const MyTickets = (props: Props) => {
 
   useEffect(() => {
     const getMyAssets = async () => {
-      const algorandAddress = (await getStoreValue(key_address)) as string;
+      const algorandAddress = await getStoreValue(key_address);
       const assetIds = await getAssetIdsFromAccount(algorandAddress);
       const assets = await Promise.all(
         assetIds.map(async (assetId) => {

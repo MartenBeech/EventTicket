@@ -5,5 +5,6 @@ export async function setStorePair(key: string, value: string) {
 }
 
 export async function getStoreValue(key: string) {
-  return await getItemAsync(key);
+  const storeValue = await getItemAsync(key);
+  return storeValue ?? "";
 }

@@ -24,8 +24,8 @@ export const VerifyTicket = (props: Props) => {
   });
   useEffect(() => {
     const getKeyAddress = async () => {
-      const keyAddress = (await getStoreValue(key_address)) as string;
-      const mnemonic = (await getStoreValue(key_mnemonic)) as string;
+      const keyAddress = await getStoreValue(key_address);
+      const mnemonic = await getStoreValue(key_mnemonic);
       const signedMessage = signMessage({
         publicKey: keyAddress,
         mnemonic: mnemonic,
