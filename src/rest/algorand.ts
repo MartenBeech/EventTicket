@@ -268,7 +268,7 @@ const getAssetParams = async (assetId: number) => {
   }
 };
 
-export const getUrlFromAsset = async (assetId: number): Promise<string> => {
+export const getUrlFromAssetId = async (assetId: number): Promise<string> => {
   const assetParams = await getAssetParams(assetId);
   if (assetParams) {
     return assetParams.url;

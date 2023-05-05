@@ -3,12 +3,13 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Navigation";
 import { NavigationBar } from "../../NavigationBar";
 import { EventBox } from "../../components/EventBox";
-import { getAssetIdsFromAccount, getUrlFromAsset } from "../../rest/algorand";
+import { getAssetIdsFromAccount, getUrlFromAssetId } from "../../rest/algorand";
 import { useEffect, useState } from "react";
 import { getIPFSEventData } from "../../rest/ipfs";
 import { TicketEventAssetId } from "../../entities/event";
 import { getStoreValue } from "../../store";
 import { key_address } from "../../constants";
+import { useIsFocused } from "@react-navigation/native";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "MyTickets">;
 
 interface Props {
@@ -18,6 +19,7 @@ interface Props {
 
 export const MyTickets = (props: Props) => {
   const [events, setEvents] = useState<TicketEventAssetId[]>([]);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     const getMyAssets = async () => {
@@ -25,7 +27,7 @@ export const MyTickets = (props: Props) => {
       const assetIds = await getAssetIdsFromAccount(algorandAddress);
       const assets = await Promise.all(
         assetIds.map(async (assetId) => {
-          return { url: await getUrlFromAsset(assetId), id: assetId };
+          return { url: await getUrlFromAssetId(assetId), id: assetId };
         })
       );
       const events = await Promise.all(
@@ -39,7 +41,7 @@ export const MyTickets = (props: Props) => {
       setEvents(events);
     };
     getMyAssets();
-  }, []);
+  }, [isFocused]);
 
   return (
     <View style={styles.screen}>
