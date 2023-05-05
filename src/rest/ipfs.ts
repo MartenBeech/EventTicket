@@ -28,3 +28,13 @@ export const getIPFSEventData = async (url: string) => {
   }
   return returnData;
 };
+
+export const getFileFromPinata = async (IpfsHash: string) => {
+  if (!IpfsHash) {
+    return "";
+  }
+  const response = await fetch(`${IPFSUrlPrefix}/ipfs/${IpfsHash}`);
+  const data = await response.json();
+  const file = `data:image;base64,${data.file}`;
+  return file;
+};

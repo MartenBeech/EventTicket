@@ -58,7 +58,7 @@ export const MyTickets = (props: Props) => {
                 }}
               >
                 <EventBox
-                  url={`${ticketEvent.imageUrl}`}
+                  imageUrl={`${ticketEvent.imageUrl}`}
                   title={ticketEvent.title}
                   date={ticketEvent.startDate}
                   location={ticketEvent.location}

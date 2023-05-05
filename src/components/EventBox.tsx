@@ -1,19 +1,31 @@
 import { StyleSheet, View, Image, Text } from "react-native";
-import { IPFSUrlPrefix } from "../../env";
+import { useState, useEffect } from "react";
+import { getFileFromPinata } from "../rest/ipfs";
 
 interface Props {
-  url: string;
+  imageUrl: string;
   title: string;
   date: string;
   location: string;
 }
 
 export const EventBox = (props: Props) => {
+  const [image, setImage] = useState("");
+
+  useEffect(() => {
+    const getImage = async () => {
+      const fileImage = await getFileFromPinata(props.imageUrl);
+      setImage(fileImage);
+    };
+    getImage();
+  }, []);
   return (
     <View style={styles.container}>
       <Image
         style={styles.image}
-        source={{ uri: `${IPFSUrlPrefix}/${props.url}` }}
+        source={
+          image ? { uri: image } : require("../images/ImagePlaceholder.jpg")
+        }
       />
       <View style={styles.titleContainer}>
         <Text style={styles.title} numberOfLines={1}>
