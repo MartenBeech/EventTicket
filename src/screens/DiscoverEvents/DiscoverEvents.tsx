@@ -3,7 +3,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Navigation";
 import { NavigationBar } from "../../NavigationBar";
 import { EventBox } from "../../components/EventBox";
-import { getAssetIdsFromAccount, getUrlFromAsset } from "../../rest/algorand";
+import { getAssetIdsFromAccount, getUrlFromAssetId } from "../../rest/algorand";
 import { smartContractAccountAddr } from "../../../env";
 import { useEffect, useState } from "react";
 import { getIPFSEventData } from "../../rest/ipfs";
@@ -29,7 +29,7 @@ export const DiscoverEvents = (props: Props) => {
         const assetIds = await getAssetIdsFromAccount(smartContractAccountAddr);
         const assets = await Promise.all(
           assetIds.map(async (assetId) => {
-            return { url: await getUrlFromAsset(assetId), id: assetId };
+            return { url: await getUrlFromAssetId(assetId), id: assetId };
           })
         );
         const filteredAssets = assets.filter((asset) =>
@@ -43,9 +43,6 @@ export const DiscoverEvents = (props: Props) => {
             };
           })
         );
-        events.map((event) => {
-          console.log(event);
-        });
         setEvents(events);
       };
       getAssetUrlsFromAccount();
@@ -72,7 +69,7 @@ export const DiscoverEvents = (props: Props) => {
                 }}
               >
                 <EventBox
-                  url={`${ticketEvent.imageUrl}`}
+                  imageUrl={ticketEvent.imageUrl}
                   title={ticketEvent.title}
                   date={ticketEvent.startDate}
                   location={ticketEvent.location}

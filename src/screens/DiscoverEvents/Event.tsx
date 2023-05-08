@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Navigation";
-import { IPFSUrlPrefix, smartContractAccountAddr } from "../../../env";
+import { smartContractAccountAddr } from "../../../env";
 import {
   buyAssetTransaction,
   getAssetAmountFromAccount,
@@ -17,6 +17,7 @@ import {
 } from "../../rest/algorand";
 import { useEffect, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
+import { getFileFromPinata } from "../../rest/ipfs";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "Event">;
 
 interface Props {
@@ -30,6 +31,7 @@ export const Event = (props: Props) => {
 
   const [ticketsLeft, setTicketsLeft] = useState(0);
   const [ticketsSold, setTicketsSold] = useState(0);
+  const [image, setImage] = useState("");
 
   const isFocused = useIsFocused();
 
@@ -41,9 +43,11 @@ export const Event = (props: Props) => {
           smartContractAccountAddr,
           ticketEventAssetId.assetId
         );
+        const fileImage = await getFileFromPinata(ticketEvent.imageUrl);
 
         setTicketsLeft(assetAmount);
         setTicketsSold(totalAmount - assetAmount);
+        setImage(fileImage);
       };
       getTicketAmounts();
     }
@@ -53,7 +57,9 @@ export const Event = (props: Props) => {
     <ScrollView>
       <Image
         style={styles.image}
-        source={{ uri: `${IPFSUrlPrefix}/${ticketEvent.imageUrl}` }}
+        source={
+          image ? { uri: image } : require("../../images/ImagePlaceholder.jpg")
+        }
       />
       <View style={styles.container}>
         <View style={styles.titleContainer}>

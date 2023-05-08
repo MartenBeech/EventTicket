@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Navigation";
-import { IPFSUrlPrefix, smartContractAccountAddr } from "../../../env";
+import { smartContractAccountAddr } from "../../../env";
 import {
   getAssetAmountFromAccount,
   getTotalFromAsset,
@@ -16,6 +16,7 @@ import {
 import { useEffect, useState } from "react";
 import { VerifyTicket } from "../../components/VerifyTicketModal";
 import { useIsFocused } from "@react-navigation/native";
+import { getFileFromPinata } from "../../rest/ipfs";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "Ticket">;
 
 interface Props {
@@ -27,6 +28,7 @@ export const Ticket = (props: Props) => {
   const [ticketsLeft, setTicketsLeft] = useState(0);
   const [ticketsSold, setTicketsSold] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
+  const [image, setImage] = useState("");
 
   const ticketEventAssetId = props.route.params.ticketEventAssetId;
   const ticketEvent = ticketEventAssetId.ticketEvent;
@@ -41,9 +43,11 @@ export const Ticket = (props: Props) => {
           smartContractAccountAddr,
           ticketEventAssetId.assetId
         );
+        const fileImage = await getFileFromPinata(ticketEvent.imageUrl);
 
         setTicketsLeft(assetAmount);
         setTicketsSold(totalAmount - assetAmount);
+        setImage(fileImage);
       };
       getTicketAmounts();
     }
@@ -55,7 +59,9 @@ export const Ticket = (props: Props) => {
 
       <Image
         style={styles.image}
-        source={{ uri: `${IPFSUrlPrefix}/${ticketEvent.imageUrl}` }}
+        source={
+          image ? { uri: image } : require("../../images/ImagePlaceholder.jpg")
+        }
       />
       <View style={styles.container}>
         <View style={styles.titleContainer}>

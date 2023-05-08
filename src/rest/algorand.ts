@@ -59,8 +59,8 @@ interface CreateTransactionProps {
 
 export const createTransaction = async (props: CreateTransactionProps) => {
   const transactionParams = await getTransactionParams();
-  const algorandAddress = (await getStoreValue(key_address)) as string;
-  const mnemonic = (await getStoreValue(key_mnemonic)) as string;
+  const algorandAddress = await getStoreValue(key_address);
+  const mnemonic = await getStoreValue(key_mnemonic);
 
   const txn: TransactionLike = {
     flatFee: true,
@@ -103,8 +103,8 @@ export const createTransaction = async (props: CreateTransactionProps) => {
 
 export const optInAsset = async (assetId: number) => {
   const transactionParams = await getTransactionParams();
-  const algorandAddress = (await getStoreValue(key_address)) as string;
-  const mnemonic = (await getStoreValue(key_mnemonic)) as string;
+  const algorandAddress = await getStoreValue(key_address);
+  const mnemonic = await getStoreValue(key_mnemonic);
 
   const txn: TransactionLike = {
     type: TransactionType.axfer,
@@ -148,8 +148,8 @@ export const optInAsset = async (assetId: number) => {
 
 export const buyAssetTransaction = async (assetId: number) => {
   const transactionParams = await getTransactionParams();
-  const algorandAddress = (await getStoreValue(key_address)) as string;
-  const mnemonic = (await getStoreValue(key_mnemonic)) as string;
+  const algorandAddress = await getStoreValue(key_address);
+  const mnemonic = await getStoreValue(key_mnemonic);
 
   const hash = sha512_256("get_asset(asset)void");
   const methodSelector = Buffer.from(hash.slice(0, 8), "hex");
@@ -268,7 +268,7 @@ const getAssetParams = async (assetId: number) => {
   }
 };
 
-export const getUrlFromAsset = async (assetId: number): Promise<string> => {
+export const getUrlFromAssetId = async (assetId: number): Promise<string> => {
   const assetParams = await getAssetParams(assetId);
   if (assetParams) {
     return assetParams.url;
