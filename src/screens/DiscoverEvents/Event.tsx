@@ -16,6 +16,7 @@ import {
   optInAsset,
 } from "../../rest/algorand";
 import { useEffect, useState } from "react";
+import { useIsFocused } from "@react-navigation/native";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "Event">;
 
 interface Props {
@@ -30,19 +31,23 @@ export const Event = (props: Props) => {
   const [ticketsLeft, setTicketsLeft] = useState(0);
   const [ticketsSold, setTicketsSold] = useState(0);
 
-  useEffect(() => {
-    const getTicketAmounts = async () => {
-      const totalAmount = await getTotalFromAsset(ticketEventAssetId.assetId);
-      const assetAmount = await getAssetAmountFromAccount(
-        smartContractAccountAddr,
-        ticketEventAssetId.assetId
-      );
+  const isFocused = useIsFocused();
 
-      setTicketsLeft(assetAmount);
-      setTicketsSold(totalAmount - assetAmount);
-    };
-    getTicketAmounts();
-  }, []);
+  useEffect(() => {
+    if (isFocused) {
+      const getTicketAmounts = async () => {
+        const totalAmount = await getTotalFromAsset(ticketEventAssetId.assetId);
+        const assetAmount = await getAssetAmountFromAccount(
+          smartContractAccountAddr,
+          ticketEventAssetId.assetId
+        );
+
+        setTicketsLeft(assetAmount);
+        setTicketsSold(totalAmount - assetAmount);
+      };
+      getTicketAmounts();
+    }
+  }, [isFocused]);
 
   return (
     <ScrollView>

@@ -8,6 +8,7 @@ import { smartContractAccountAddr } from "../../../env";
 import { useEffect, useState } from "react";
 import { getIPFSEventData } from "../../rest/ipfs";
 import { TicketEventAssetId } from "../../entities/event";
+import { useIsFocused } from "@react-navigation/native";
 type NavigationRoute = NativeStackScreenProps<
   RootStackParamList,
   "DiscoverEvents"
@@ -20,27 +21,36 @@ interface Props {
 
 export const DiscoverEvents = (props: Props) => {
   const [events, setEvents] = useState<TicketEventAssetId[]>([]);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-    const getAssetUrlsFromAccount = async () => {
-      const assetIds = await getAssetIdsFromAccount(smartContractAccountAddr);
-      const assets = await Promise.all(
-        assetIds.map(async (assetId) => {
-          return { url: await getUrlFromAsset(assetId), id: assetId };
-        })
-      );
-      const events = await Promise.all(
-        assets.map(async (asset) => {
-          return {
-            ticketEvent: await getIPFSEventData(asset.url),
-            assetId: asset.id,
-          };
-        })
-      );
-      setEvents(events);
-    };
-    getAssetUrlsFromAccount();
-  }, []);
+    if (isFocused) {
+      const getAssetUrlsFromAccount = async () => {
+        const assetIds = await getAssetIdsFromAccount(smartContractAccountAddr);
+        const assets = await Promise.all(
+          assetIds.map(async (assetId) => {
+            return { url: await getUrlFromAsset(assetId), id: assetId };
+          })
+        );
+        const filteredAssets = assets.filter((asset) =>
+          asset.url.includes("ipfs")
+        );
+        const events = await Promise.all(
+          filteredAssets.map(async (asset) => {
+            return {
+              ticketEvent: await getIPFSEventData(asset.url),
+              assetId: asset.id,
+            };
+          })
+        );
+        events.map((event) => {
+          console.log(event);
+        });
+        setEvents(events);
+      };
+      getAssetUrlsFromAccount();
+    }
+  }, [isFocused]);
 
   return (
     <View style={styles.screen}>
@@ -54,7 +64,10 @@ export const DiscoverEvents = (props: Props) => {
                 style={styles.button}
                 onPress={() => {
                   props.navigation.navigate("Event", {
-                    ticketEventAssetId: { ticketEvent, assetId: event.assetId },
+                    ticketEventAssetId: {
+                      ticketEvent,
+                      assetId: event.assetId,
+                    },
                   });
                 }}
               >

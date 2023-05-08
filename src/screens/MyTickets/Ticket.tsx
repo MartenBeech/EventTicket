@@ -15,6 +15,7 @@ import {
 } from "../../rest/algorand";
 import { useEffect, useState } from "react";
 import { VerifyTicket } from "../../components/VerifyTicketModal";
+import { useIsFocused } from "@react-navigation/native";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "Ticket">;
 
 interface Props {
@@ -30,19 +31,23 @@ export const Ticket = (props: Props) => {
   const ticketEventAssetId = props.route.params.ticketEventAssetId;
   const ticketEvent = ticketEventAssetId.ticketEvent;
 
-  useEffect(() => {
-    const getTicketAmounts = async () => {
-      const totalAmount = await getTotalFromAsset(ticketEventAssetId.assetId);
-      const assetAmount = await getAssetAmountFromAccount(
-        smartContractAccountAddr,
-        ticketEventAssetId.assetId
-      );
+  const isFocused = useIsFocused();
 
-      setTicketsLeft(assetAmount);
-      setTicketsSold(totalAmount - assetAmount);
-    };
-    getTicketAmounts();
-  }, []);
+  useEffect(() => {
+    if (isFocused) {
+      const getTicketAmounts = async () => {
+        const totalAmount = await getTotalFromAsset(ticketEventAssetId.assetId);
+        const assetAmount = await getAssetAmountFromAccount(
+          smartContractAccountAddr,
+          ticketEventAssetId.assetId
+        );
+
+        setTicketsLeft(assetAmount);
+        setTicketsSold(totalAmount - assetAmount);
+      };
+      getTicketAmounts();
+    }
+  }, [isFocused]);
 
   return (
     <ScrollView>

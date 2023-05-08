@@ -9,6 +9,7 @@ import { getIPFSEventData } from "../../rest/ipfs";
 import { TicketEventAssetId } from "../../entities/event";
 import { getStoreValue } from "../../store";
 import { key_address } from "../../constants";
+import { useIsFocused } from "@react-navigation/native";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "MyTickets">;
 
 interface Props {
@@ -19,27 +20,31 @@ interface Props {
 export const MyTickets = (props: Props) => {
   const [events, setEvents] = useState<TicketEventAssetId[]>([]);
 
+  const isFocused = useIsFocused();
+
   useEffect(() => {
-    const getMyAssets = async () => {
-      const algorandAddress = (await getStoreValue(key_address)) as string;
-      const assetIds = await getAssetIdsFromAccount(algorandAddress);
-      const assets = await Promise.all(
-        assetIds.map(async (assetId) => {
-          return { url: await getUrlFromAsset(assetId), id: assetId };
-        })
-      );
-      const events = await Promise.all(
-        assets.map(async (asset) => {
-          return {
-            ticketEvent: await getIPFSEventData(asset.url),
-            assetId: asset.id,
-          };
-        })
-      );
-      setEvents(events);
-    };
-    getMyAssets();
-  }, []);
+    if (isFocused) {
+      const getMyAssets = async () => {
+        const algorandAddress = (await getStoreValue(key_address)) as string;
+        const assetIds = await getAssetIdsFromAccount(algorandAddress);
+        const assets = await Promise.all(
+          assetIds.map(async (assetId) => {
+            return { url: await getUrlFromAsset(assetId), id: assetId };
+          })
+        );
+        const events = await Promise.all(
+          assets.map(async (asset) => {
+            return {
+              ticketEvent: await getIPFSEventData(asset.url),
+              assetId: asset.id,
+            };
+          })
+        );
+        setEvents(events);
+      };
+      getMyAssets();
+    }
+  }, [isFocused]);
 
   return (
     <View style={styles.screen}>
