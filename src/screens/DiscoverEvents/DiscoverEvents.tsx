@@ -32,11 +32,8 @@ export const DiscoverEvents = (props: Props) => {
             return { url: await getUrlFromAssetId(assetId), id: assetId };
           })
         );
-        const filteredAssets = assets.filter((asset) =>
-          asset.url.includes("ipfs")
-        );
         const events = await Promise.all(
-          filteredAssets.map(async (asset) => {
+          assets.map(async (asset) => {
             return {
               ticketEvent: await getIPFSEventData(asset.url),
               assetId: asset.id,
