@@ -1,13 +1,16 @@
 import { View, StyleSheet } from "react-native";
 import QRCode from "react-native-qrcode-svg";
-import { SignedMessage } from "../entities/signedMessage";
+import {
+  SignedMessage,
+  SignedMessageSimplified,
+} from "../entities/signedMessage";
 
 export const QrComponent = (props: SignedMessage) => {
   const message = Array.from(props.message);
   const publicKey = props.publicKey;
   const signature = Array.from(props.signature);
 
-  const signedMessage = {
+  const signedMessage: SignedMessageSimplified = {
     message,
     publicKey,
     signature,

@@ -9,7 +9,7 @@ import { QrComponent } from "./QrComponent";
 import { getStoreValue } from "../store";
 import { key_address, key_mnemonic } from "../constants";
 import { useEffect, useState } from "react";
-import { signMessage } from "../algorand/signMessage";
+import { signMessage } from "../algorand/messageHandler";
 import { SignedMessage } from "../entities/signedMessage";
 
 interface Props {
