@@ -10,6 +10,7 @@ import { getIPFSEventData } from "../../rest/ipfs";
 import { TicketEventAssetId } from "../../entities/event";
 import { useIsFocused } from "@react-navigation/native";
 import { Spinner } from "../../components/Spinner";
+import { Snackbar, SnackbarColor } from "../../components/Snackbar";
 type NavigationRoute = NativeStackScreenProps<
   RootStackParamList,
   "DiscoverEvents"
@@ -22,11 +23,14 @@ interface Props {
 
 export const DiscoverEvents = (props: Props) => {
   const [events, setEvents] = useState<TicketEventAssetId[]>([]);
+  const [snackBarText, setSnackBarText] = useState("");
+  const [snackBarColor, setSnackBarColor] = useState<SnackbarColor>("green");
   const [isLoading, setIsLoading] = useState(false);
   const isFocused = useIsFocused();
 
   useEffect(() => {
     if (isFocused) {
+      setSnackBarText(props.route.params.snackbarText);
       const getAssetUrlsFromAccount = async () => {
         setIsLoading(true);
         const assetIds = await getAssetIdsFromAccount(smartContractAccountAddr);
@@ -53,6 +57,11 @@ export const DiscoverEvents = (props: Props) => {
   return (
     <View style={styles.screen}>
       {isLoading && <Spinner />}
+      <Snackbar
+        textState={snackBarText}
+        setTextState={setSnackBarText}
+        backgroundColor={snackBarColor}
+      />
       {!events.length && !isLoading && (
         <View style={styles.textContainer}>
           <Text style={styles.text}>

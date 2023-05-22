@@ -54,51 +54,62 @@ export const Ticket = (props: Props) => {
   }, [isFocused]);
 
   return (
-    <ScrollView>
-      {modalVisible && <VerifyTicket setModalVisible={setModalVisible} />}
+    <View style={styles.screen}>
+      <ScrollView>
+        {modalVisible && <VerifyTicket setModalVisible={setModalVisible} />}
 
-      <Image
-        style={styles.image}
-        source={
-          image ? { uri: image } : require("../../images/ImagePlaceholder.jpg")
-        }
-      />
-      <View style={styles.container}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>{ticketEvent.title}</Text>
+        <Image
+          style={styles.image}
+          source={
+            image
+              ? { uri: image }
+              : require("../../images/ImagePlaceholder.jpg")
+          }
+        />
+        <View style={styles.container}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>{ticketEvent.title}</Text>
+          </View>
+          <View style={styles.infoContainer}>
+            <Text style={styles.info}>{ticketEvent.startDate}</Text>
+            <Text style={styles.info}>{ticketEvent.endDate}</Text>
+            <Text style={styles.info}>{ticketEvent.location}</Text>
+            <Text style={styles.info}>{ticketEvent.creatorName}</Text>
+          </View>
+          <View style={styles.descriptionContainer}>
+            <Text style={styles.description}>{ticketEvent.description}</Text>
+          </View>
+          <View style={styles.priceContainer}>
+            <Text style={styles.price}>
+              Price: {ticketEvent.price ? `${ticketEvent.price} kr.` : "Free"}
+            </Text>
+          </View>
+          <Pressable
+            style={styles.buyTicketButton}
+            onPress={async () => {
+              setModalVisible(true);
+            }}
+          >
+            <Text style={styles.buyTicketText}>Verify Ticket</Text>
+          </Pressable>
+          <View style={styles.ticketsCounterContainer}>
+            <Text style={styles.ticketsCounter}>
+              {ticketsLeft} tickets left
+            </Text>
+            <Text style={styles.ticketsCounter}>
+              {ticketsSold} tickets sold
+            </Text>
+          </View>
         </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.info}>{ticketEvent.startDate}</Text>
-          <Text style={styles.info}>{ticketEvent.endDate}</Text>
-          <Text style={styles.info}>{ticketEvent.location}</Text>
-          <Text style={styles.info}>{ticketEvent.creatorName}</Text>
-        </View>
-        <View style={styles.descriptionContainer}>
-          <Text style={styles.description}>{ticketEvent.description}</Text>
-        </View>
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>
-            Price: {ticketEvent.price ? `${ticketEvent.price} kr.` : "Free"}
-          </Text>
-        </View>
-        <Pressable
-          style={styles.buyTicketButton}
-          onPress={async () => {
-            setModalVisible(true);
-          }}
-        >
-          <Text style={styles.buyTicketText}>Verify Ticket</Text>
-        </Pressable>
-        <View style={styles.ticketsCounterContainer}>
-          <Text style={styles.ticketsCounter}>{ticketsLeft} tickets left</Text>
-          <Text style={styles.ticketsCounter}>{ticketsSold} tickets sold</Text>
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  screen: {
+    minWidth: "100%",
+  },
   container: {
     marginHorizontal: 10,
   },

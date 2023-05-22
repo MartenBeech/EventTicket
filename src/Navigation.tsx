@@ -9,7 +9,7 @@ import { IdentifierModal } from "./components/IdentifierModal";
 import { TicketEventAssetId } from "./entities/event";
 
 export type RootStackParamList = {
-  DiscoverEvents: undefined;
+  DiscoverEvents: { snackbarText: string };
   MyTickets: undefined;
   Event: { ticketEventAssetId: TicketEventAssetId };
   Ticket: { ticketEventAssetId: TicketEventAssetId };
@@ -25,7 +25,7 @@ export const Navigation = () => {
         <RootStack.Screen
           name="DiscoverEvents"
           component={DiscoverEvents}
-          initialParams={undefined}
+          initialParams={{ snackbarText: "" }}
           options={{
             title: "",
             headerLeft: () => {

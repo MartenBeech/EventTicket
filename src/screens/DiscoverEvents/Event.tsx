@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import { getFileFromPinata } from "../../rest/ipfs";
 import { Spinner } from "../../components/Spinner";
+import { Snackbar, SnackbarColor } from "../../components/Snackbar";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "Event">;
 
 interface Props {
@@ -33,6 +34,8 @@ export const Event = (props: Props) => {
   const [ticketsLeft, setTicketsLeft] = useState(0);
   const [ticketsSold, setTicketsSold] = useState(0);
   const [image, setImage] = useState("");
+  const [snackBarText, setSnackBarText] = useState("");
+  const [snackBarColor, setSnackBarColor] = useState<SnackbarColor>("green");
   const [isLoading, setIsLoading] = useState(false);
 
   const isFocused = useIsFocused();
@@ -55,54 +58,86 @@ export const Event = (props: Props) => {
     }
   }, [isFocused]);
 
+  const buyTicket = async () => {
+    setIsLoading(true);
+    const optInAssetResult = await optInAsset(ticketEventAssetId.assetId);
+    if (!optInAssetResult) {
+      setSnackBarColor("red");
+      setSnackBarText("Failed to opt in asset");
+      setIsLoading(false);
+      return;
+    }
+    const buyAssetTransactionResult = await buyAssetTransaction(
+      ticketEventAssetId.assetId
+    );
+    if (!buyAssetTransactionResult) {
+      setSnackBarColor("red");
+      setSnackBarText("Failed to send ticket transaction");
+      setIsLoading(false);
+      return;
+    }
+    setIsLoading(false);
+    props.navigation.navigate("DiscoverEvents", {
+      snackbarText: "Successfully bought ticket",
+    });
+  };
+
   return (
-    <ScrollView>
+    <View style={styles.screen}>
       {isLoading && <Spinner />}
-      <Image
-        style={styles.image}
-        source={
-          image ? { uri: image } : require("../../images/ImagePlaceholder.jpg")
-        }
+      <Snackbar
+        textState={snackBarText}
+        setTextState={setSnackBarText}
+        backgroundColor={snackBarColor}
       />
-      <View style={styles.container}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>{ticketEvent.title}</Text>
+      <ScrollView>
+        <Image
+          style={styles.image}
+          source={
+            image
+              ? { uri: image }
+              : require("../../images/ImagePlaceholder.jpg")
+          }
+        />
+        <View style={styles.container}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>{ticketEvent.title}</Text>
+          </View>
+          <View style={styles.infoContainer}>
+            <Text style={styles.info}>{ticketEvent.startDate}</Text>
+            <Text style={styles.info}>{ticketEvent.endDate}</Text>
+            <Text style={styles.info}>{ticketEvent.location}</Text>
+            <Text style={styles.info}>{ticketEvent.creatorName}</Text>
+          </View>
+          <View style={styles.descriptionContainer}>
+            <Text style={styles.description}>{ticketEvent.description}</Text>
+          </View>
+          <View style={styles.priceContainer}>
+            <Text style={styles.price}>
+              Price: {ticketEvent.price ? `${ticketEvent.price} kr.` : "Free"}
+            </Text>
+          </View>
+          <Pressable style={styles.buyTicketButton} onPress={buyTicket}>
+            <Text style={styles.buyTicketText}>Buy Ticket</Text>
+          </Pressable>
+          <View style={styles.ticketsCounterContainer}>
+            <Text style={styles.ticketsCounter}>
+              {ticketsLeft} tickets left
+            </Text>
+            <Text style={styles.ticketsCounter}>
+              {ticketsSold} tickets sold
+            </Text>
+          </View>
         </View>
-        <View style={styles.infoContainer}>
-          <Text style={styles.info}>{ticketEvent.startDate}</Text>
-          <Text style={styles.info}>{ticketEvent.endDate}</Text>
-          <Text style={styles.info}>{ticketEvent.location}</Text>
-          <Text style={styles.info}>{ticketEvent.creatorName}</Text>
-        </View>
-        <View style={styles.descriptionContainer}>
-          <Text style={styles.description}>{ticketEvent.description}</Text>
-        </View>
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>
-            Price: {ticketEvent.price ? `${ticketEvent.price} kr.` : "Free"}
-          </Text>
-        </View>
-        <Pressable
-          style={styles.buyTicketButton}
-          onPress={async () => {
-            setIsLoading(true);
-            await optInAsset(ticketEventAssetId.assetId);
-            await buyAssetTransaction(ticketEventAssetId.assetId);
-            setIsLoading(false);
-          }}
-        >
-          <Text style={styles.buyTicketText}>Buy Ticket</Text>
-        </Pressable>
-        <View style={styles.ticketsCounterContainer}>
-          <Text style={styles.ticketsCounter}>{ticketsLeft} tickets left</Text>
-          <Text style={styles.ticketsCounter}>{ticketsSold} tickets sold</Text>
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  screen: {
+    minHeight: "100%",
+  },
   container: {
     marginHorizontal: 10,
   },
