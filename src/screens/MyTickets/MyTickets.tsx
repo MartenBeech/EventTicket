@@ -1,4 +1,4 @@
-import { StyleSheet, View, ScrollView, Pressable } from "react-native";
+import { StyleSheet, View, ScrollView, Pressable, Text } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Navigation";
 import { NavigationBar } from "../../NavigationBar";
@@ -10,6 +10,7 @@ import { TicketEventAssetId } from "../../entities/event";
 import { getStoreValue } from "../../store";
 import { key_address } from "../../constants";
 import { useIsFocused } from "@react-navigation/native";
+import { Spinner } from "../../components/Spinner";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "MyTickets">;
 
 interface Props {
@@ -19,11 +20,13 @@ interface Props {
 
 export const MyTickets = (props: Props) => {
   const [events, setEvents] = useState<TicketEventAssetId[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const isFocused = useIsFocused();
 
   useEffect(() => {
     if (isFocused) {
       const getMyAssets = async () => {
+        setIsLoading(true);
         const algorandAddress = (await getStoreValue(key_address)) as string;
         const assetIds = await getAssetIdsFromAccount(algorandAddress);
         const assets = await Promise.all(
@@ -40,6 +43,7 @@ export const MyTickets = (props: Props) => {
           })
         );
         setEvents(events);
+        setIsLoading(false);
       };
       getMyAssets();
     }
@@ -47,6 +51,12 @@ export const MyTickets = (props: Props) => {
 
   return (
     <View style={styles.screen}>
+      {isLoading && <Spinner />}
+      {!events.length && !isLoading && (
+        <View style={styles.textContainer}>
+          <Text style={styles.text}>You have no active events</Text>
+        </View>
+      )}
       <ScrollView>
         <View style={styles.container}>
           {events.map((event, index) => {
@@ -88,5 +98,13 @@ const styles = StyleSheet.create({
   button: {
     width: "100%",
     alignItems: "center",
+  },
+  textContainer: {
+    height: "90%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  text: {
+    fontSize: 16,
   },
 });

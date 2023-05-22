@@ -1,4 +1,4 @@
-import { StyleSheet, View, ScrollView, Pressable } from "react-native";
+import { StyleSheet, View, ScrollView, Pressable, Text } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Navigation";
 import { NavigationBar } from "../../NavigationBar";
@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { getIPFSEventData } from "../../rest/ipfs";
 import { TicketEventAssetId } from "../../entities/event";
 import { useIsFocused } from "@react-navigation/native";
+import { Spinner } from "../../components/Spinner";
 type NavigationRoute = NativeStackScreenProps<
   RootStackParamList,
   "DiscoverEvents"
@@ -21,11 +22,13 @@ interface Props {
 
 export const DiscoverEvents = (props: Props) => {
   const [events, setEvents] = useState<TicketEventAssetId[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const isFocused = useIsFocused();
 
   useEffect(() => {
     if (isFocused) {
       const getAssetUrlsFromAccount = async () => {
+        setIsLoading(true);
         const assetIds = await getAssetIdsFromAccount(smartContractAccountAddr);
         const assets = await Promise.all(
           assetIds.map(async (assetId) => {
@@ -41,6 +44,7 @@ export const DiscoverEvents = (props: Props) => {
           })
         );
         setEvents(events);
+        setIsLoading(false);
       };
       getAssetUrlsFromAccount();
     }
@@ -48,6 +52,14 @@ export const DiscoverEvents = (props: Props) => {
 
   return (
     <View style={styles.screen}>
+      {isLoading && <Spinner />}
+      {!events.length && !isLoading && (
+        <View style={styles.textContainer}>
+          <Text style={styles.text}>
+            There are currently no events to discover
+          </Text>
+        </View>
+      )}
       <ScrollView>
         <View style={styles.container}>
           {events.map((event, index) => {
@@ -92,5 +104,13 @@ const styles = StyleSheet.create({
   button: {
     width: "100%",
     alignItems: "center",
+  },
+  textContainer: {
+    height: "90%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  text: {
+    fontSize: 16,
   },
 });

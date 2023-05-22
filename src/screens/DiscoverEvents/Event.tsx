@@ -18,6 +18,7 @@ import {
 import { useEffect, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import { getFileFromPinata } from "../../rest/ipfs";
+import { Spinner } from "../../components/Spinner";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "Event">;
 
 interface Props {
@@ -32,6 +33,7 @@ export const Event = (props: Props) => {
   const [ticketsLeft, setTicketsLeft] = useState(0);
   const [ticketsSold, setTicketsSold] = useState(0);
   const [image, setImage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const isFocused = useIsFocused();
 
@@ -55,6 +57,7 @@ export const Event = (props: Props) => {
 
   return (
     <ScrollView>
+      {isLoading && <Spinner />}
       <Image
         style={styles.image}
         source={
@@ -82,8 +85,10 @@ export const Event = (props: Props) => {
         <Pressable
           style={styles.buyTicketButton}
           onPress={async () => {
+            setIsLoading(true);
             await optInAsset(ticketEventAssetId.assetId);
             await buyAssetTransaction(ticketEventAssetId.assetId);
+            setIsLoading(false);
           }}
         >
           <Text style={styles.buyTicketText}>Buy Ticket</Text>
