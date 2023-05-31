@@ -12,6 +12,7 @@ import { smartContractAccountAddr } from "../../../env";
 import {
   buyAssetTransaction,
   getAssetAmountFromAccount,
+  getAssetIdsFromAccount,
   getTotalFromAsset,
   optInAsset,
 } from "../../rest/algorand";
@@ -20,6 +21,8 @@ import { useIsFocused } from "@react-navigation/native";
 import { getFileFromPinata } from "../../rest/ipfs";
 import { Spinner } from "../../components/Spinner";
 import { Snackbar, SnackbarColor } from "../../components/Snackbar";
+import { getStoreValue } from "../../store";
+import { key_address } from "../../constants";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "Event">;
 
 interface Props {
@@ -37,12 +40,14 @@ export const Event = (props: Props) => {
   const [snackBarText, setSnackBarText] = useState("");
   const [snackBarColor, setSnackBarColor] = useState<SnackbarColor>("green");
   const [isLoading, setIsLoading] = useState(false);
+  const [ticketOwned, setTicketOwned] = useState(false);
 
   const isFocused = useIsFocused();
 
   useEffect(() => {
     if (isFocused) {
-      const getTicketAmounts = async () => {
+      const handleTicketAmounts = async () => {
+        setIsLoading(true);
         const totalAmount = await getTotalFromAsset(ticketEventAssetId.assetId);
         const assetAmount = await getAssetAmountFromAccount(
           smartContractAccountAddr,
@@ -53,8 +58,20 @@ export const Event = (props: Props) => {
         setTicketsLeft(assetAmount);
         setTicketsSold(totalAmount - assetAmount);
         setImage(fileImage);
+        setIsLoading(false);
       };
-      getTicketAmounts();
+      handleTicketAmounts();
+
+      const handleOwnedTicket = async () => {
+        setIsLoading(true);
+        const algorandAddress = (await getStoreValue(key_address)) as string;
+        const assetIds = await getAssetIdsFromAccount(algorandAddress);
+        if (assetIds.includes(props.route.params.ticketEventAssetId.assetId)) {
+          setTicketOwned(true);
+        }
+        setIsLoading(false);
+      };
+      handleOwnedTicket();
     }
   }, [isFocused]);
 
@@ -118,9 +135,20 @@ export const Event = (props: Props) => {
               Price: {ticketEvent.price ? `${ticketEvent.price} kr.` : "Free"}
             </Text>
           </View>
-          <Pressable style={styles.buyTicketButton} onPress={buyTicket}>
-            <Text style={styles.buyTicketText}>Buy Ticket</Text>
-          </Pressable>
+          {ticketOwned ? (
+            <Pressable
+              style={{ ...styles.buyTicketButton, ...styles.ticketBoughtColor }}
+            >
+              <Text style={styles.buyTicketText}>Ticket Bought</Text>
+            </Pressable>
+          ) : (
+            <Pressable
+              style={{ ...styles.buyTicketButton, ...styles.buyTicketColor }}
+              onPress={buyTicket}
+            >
+              <Text style={styles.buyTicketText}>Buy Ticket</Text>
+            </Pressable>
+          )}
           <View style={styles.ticketsCounterContainer}>
             <Text style={styles.ticketsCounter}>
               {ticketsLeft} tickets left
@@ -178,10 +206,15 @@ const styles = StyleSheet.create({
   buyTicketButton: {
     height: 50,
     width: "100%",
-    backgroundColor: "#5955FF",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 15,
+  },
+  buyTicketColor: {
+    backgroundColor: "#5955FF",
+  },
+  ticketBoughtColor: {
+    backgroundColor: "#417c27",
   },
   buyTicketText: {
     fontSize: 18,
