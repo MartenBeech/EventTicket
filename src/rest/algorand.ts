@@ -156,8 +156,7 @@ export const buyAssetTransaction = async (assetId: number) => {
   const hash = sha512_256("get_asset(asset)void");
   const methodSelector = Buffer.from(hash.slice(0, 8), "hex");
 
-  // Remember to lock your computer :)
-  const assetIndex = 0; // Since we have only one ass in the appForeignAssets array
+  const assetIndex = 0; // Since we have only one asset in the appForeignAssets array
   const arg = algosdk.encodeUint64(assetIndex);
 
   const txn: AppNoOpTxn = {
