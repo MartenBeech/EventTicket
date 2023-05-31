@@ -10,6 +10,9 @@ import { getIPFSEventData } from "../../rest/ipfs";
 import { TicketEventAssetId } from "../../entities/event";
 import { useIsFocused } from "@react-navigation/native";
 import { Spinner } from "../../components/Spinner";
+import { Pagination } from "../../components/Pagination";
+import { convertDateMonthYearToUTC } from "../../services/dateTime";
+import { filterItemsForPage } from "../../services/filterItemsForPage";
 type NavigationRoute = NativeStackScreenProps<
   RootStackParamList,
   "DiscoverEvents"
@@ -21,8 +24,10 @@ interface Props {
 }
 
 export const DiscoverEvents = (props: Props) => {
+  const [totalEvents, setTotalEvents] = useState(0);
   const [events, setEvents] = useState<TicketEventAssetId[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -30,6 +35,7 @@ export const DiscoverEvents = (props: Props) => {
       const getAssetUrlsFromAccount = async () => {
         setIsLoading(true);
         const assetIds = await getAssetIdsFromAccount(smartContractAccountAddr);
+        setTotalEvents(assetIds.length);
         const assets = await Promise.all(
           assetIds.map(async (assetId) => {
             return { url: await getUrlFromAssetId(assetId), id: assetId };
@@ -43,12 +49,22 @@ export const DiscoverEvents = (props: Props) => {
             };
           })
         );
-        setEvents(events);
+        events.sort((a, b) => {
+          return convertDateMonthYearToUTC(a.ticketEvent.startDate) >
+            convertDateMonthYearToUTC(b.ticketEvent.startDate)
+            ? 1
+            : -1;
+        });
+        const filteredEvents = filterItemsForPage({
+          items: events,
+          currentPage,
+        });
+        setEvents(filteredEvents);
         setIsLoading(false);
       };
       getAssetUrlsFromAccount();
     }
-  }, [isFocused]);
+  }, [isFocused, currentPage]);
 
   return (
     <View style={styles.screen}>
@@ -86,6 +102,11 @@ export const DiscoverEvents = (props: Props) => {
               </Pressable>
             );
           })}
+          <Pagination
+            totalItems={totalEvents}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+          />
         </View>
       </ScrollView>
       <NavigationBar navigation={props.navigation} />

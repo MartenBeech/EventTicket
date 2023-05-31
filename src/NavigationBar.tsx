@@ -34,7 +34,7 @@ export const NavigationBar = (props: Props) => {
       <Pressable
         style={styles.button}
         onPress={() => {
-          props.navigation.navigate(myTickets);
+          props.navigation.navigate(myTickets, { snackbarText: "" });
         }}
       >
         <Text
