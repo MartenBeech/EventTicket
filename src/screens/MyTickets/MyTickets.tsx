@@ -11,6 +11,7 @@ import { getStoreValue } from "../../store";
 import { key_address } from "../../constants";
 import { useIsFocused } from "@react-navigation/native";
 import { Spinner } from "../../components/Spinner";
+import { Snackbar } from "../../components/Snackbar";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "MyTickets">;
 
 interface Props {
@@ -20,11 +21,13 @@ interface Props {
 
 export const MyTickets = (props: Props) => {
   const [events, setEvents] = useState<TicketEventAssetId[]>([]);
+  const [snackBarText, setSnackBarText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const isFocused = useIsFocused();
 
   useEffect(() => {
     if (isFocused) {
+      setSnackBarText(props.route.params.snackbarText);
       const getMyAssets = async () => {
         setIsLoading(true);
         const algorandAddress = (await getStoreValue(key_address)) as string;
@@ -52,6 +55,11 @@ export const MyTickets = (props: Props) => {
   return (
     <View style={styles.screen}>
       {isLoading && <Spinner />}
+      <Snackbar
+        textState={snackBarText}
+        setTextState={setSnackBarText}
+        backgroundColor={"green"}
+      />
       {!events.length && !isLoading && (
         <View style={styles.textContainer}>
           <Text style={styles.text}>You have no active events</Text>

@@ -76,8 +76,9 @@ export const Event = (props: Props) => {
       setIsLoading(false);
       return;
     }
+    await new Promise((f) => setTimeout(f, 5000));
     setIsLoading(false);
-    props.navigation.navigate("DiscoverEvents", {
+    props.navigation.navigate("MyTickets", {
       snackbarText: "Successfully bought ticket",
     });
   };
