@@ -1,4 +1,4 @@
-import { StyleSheet, View, Pressable, Text } from "react-native";
+import { StyleSheet, View, Pressable, Text, Image } from "react-native";
 
 interface Props {
   totalItems: number;
@@ -36,6 +36,23 @@ export const Pagination = (props: Props) => {
 
   return (
     <View style={styles.container}>
+      <Pressable
+        style={
+          props.currentPage === 1
+            ? { ...styles.circle, ...styles.currentPageColor }
+            : { ...styles.circle, ...styles.notCurrentPageColor }
+        }
+        onPress={() => {
+          if (props.currentPage != 1) {
+            props.setCurrentPage(props.currentPage - 1);
+          }
+        }}
+      >
+        <Image
+          style={styles.image}
+          source={require("../images/ChevronLeft.png")}
+        />
+      </Pressable>
       {pages.map((page, index) => {
         return (
           <Pressable
@@ -51,6 +68,23 @@ export const Pagination = (props: Props) => {
           </Pressable>
         );
       })}
+      <Pressable
+        style={
+          props.currentPage === totalPages
+            ? { ...styles.circle, ...styles.currentPageColor }
+            : { ...styles.circle, ...styles.notCurrentPageColor }
+        }
+        onPress={() => {
+          if (props.currentPage != totalPages) {
+            props.setCurrentPage(props.currentPage + 1);
+          }
+        }}
+      >
+        <Image
+          style={styles.image}
+          source={require("../images/ChevronRight.png")}
+        />
+      </Pressable>
     </View>
   );
 };
@@ -61,14 +95,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   circle: {
-    height: 50,
-    width: 50,
+    height: 42,
+    width: 42,
     borderWidth: 1,
-    borderRadius: 25,
+    borderRadius: 21,
     marginHorizontal: 4,
     marginBottom: 8,
     justifyContent: "center",
     alignItems: "center",
+  },
+  image: {
+    width: 30,
+    height: 30,
   },
   text: {
     fontSize: 18,
