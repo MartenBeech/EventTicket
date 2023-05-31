@@ -85,7 +85,7 @@ export const Ticket = (props: Props) => {
             </Text>
           </View>
           <Pressable
-            style={styles.buyTicketButton}
+            style={styles.verifyTicketButton}
             onPress={async () => {
               setModalVisible(true);
             }}
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 18,
   },
-  buyTicketButton: {
+  verifyTicketButton: {
     height: 50,
     width: "100%",
     backgroundColor: "#0D8200",

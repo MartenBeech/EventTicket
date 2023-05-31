@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#5955FF",
   },
   ticketBoughtColor: {
-    backgroundColor: "#417c27",
+    backgroundColor: "#0D8200",
   },
   buyTicketText: {
     fontSize: 18,
