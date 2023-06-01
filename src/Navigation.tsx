@@ -7,6 +7,7 @@ import { Ticket } from "./screens/myTickets/Ticket";
 import { View } from "react-native";
 import { IdentifierModal } from "./components/IdentifierModal";
 import { TicketEventAssetId } from "./entities/event";
+import { SearchInput } from "./components/SearchInput";
 
 export type RootStackParamList = {
   DiscoverEvents: undefined;
@@ -31,6 +32,7 @@ export const Navigation = () => {
             headerLeft: () => {
               return <View></View>;
             },
+            headerRight: () => <SearchInput />,
           }}
         />
         <RootStack.Screen

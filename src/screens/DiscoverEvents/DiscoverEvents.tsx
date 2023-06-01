@@ -13,10 +13,17 @@ import { Spinner } from "../../components/Spinner";
 import { Pagination } from "../../components/Pagination";
 import { convertDateMonthYearToUTC } from "../../services/dateTime";
 import { filterItemsForPage } from "../../services/filterItemsForPage";
+import { SearchInput } from "../../components/SearchInput";
+import { useDebouncedCallback } from "use-debounce";
 type NavigationRoute = NativeStackScreenProps<
   RootStackParamList,
   "DiscoverEvents"
 >;
+
+export interface Filter {
+  currentPage: number;
+  searchString: string;
+}
 
 interface Props {
   navigation: NavigationRoute["navigation"];
@@ -24,18 +31,21 @@ interface Props {
 }
 
 export const DiscoverEvents = (props: Props) => {
-  const [totalEvents, setTotalEvents] = useState(0);
   const [events, setEvents] = useState<TicketEventAssetId[]>([]);
+  const [totalEvents, setTotalEvents] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [filters, setFilters] = useState<Filter>({
+    currentPage: 1,
+    searchString: "",
+  });
   const isFocused = useIsFocused();
 
   useEffect(() => {
     if (isFocused) {
       const getAssetUrlsFromAccount = async () => {
         setIsLoading(true);
+        setEvents([]);
         const assetIds = await getAssetIdsFromAccount(smartContractAccountAddr);
-        setTotalEvents(assetIds.length);
         const assets = await Promise.all(
           assetIds.map(async (assetId) => {
             return { url: await getUrlFromAssetId(assetId), id: assetId };
@@ -49,31 +59,54 @@ export const DiscoverEvents = (props: Props) => {
             };
           })
         );
-        events.sort((a, b) => {
+        const searchFilteredEvents = filters.searchString
+          ? events.filter(
+              (event) =>
+                event.ticketEvent.title
+                  .toLocaleLowerCase()
+                  .includes(filters.searchString.toLocaleLowerCase()) ||
+                event.ticketEvent.creatorName
+                  .toLocaleLowerCase()
+                  .includes(filters.searchString.toLocaleLowerCase()) ||
+                event.ticketEvent.location
+                  .toLocaleLowerCase()
+                  .includes(filters.searchString.toLocaleLowerCase())
+            )
+          : events;
+        setTotalEvents(searchFilteredEvents.length);
+        const sortedEvents = searchFilteredEvents.sort((a, b) => {
           return convertDateMonthYearToUTC(a.ticketEvent.startDate) >
             convertDateMonthYearToUTC(b.ticketEvent.startDate)
             ? 1
             : -1;
         });
-        const filteredEvents = filterItemsForPage({
-          items: events,
-          currentPage,
+        const pageFilteredEvents = filterItemsForPage({
+          items: sortedEvents,
+          currentPage: filters.currentPage,
         });
-        setEvents(filteredEvents);
+        setEvents(pageFilteredEvents);
         setIsLoading(false);
       };
       getAssetUrlsFromAccount();
     }
-  }, [isFocused, currentPage]);
+  }, [isFocused, filters]);
+
+  const debouncedSetSearchString = useDebouncedCallback((value) => {
+    setFilters({ currentPage: 1, searchString: value });
+  }, 500);
+
+  useEffect(() => {
+    props.navigation.setOptions({
+      headerRight: () => <SearchInput setState={debouncedSetSearchString} />,
+    });
+  }, [props.navigation]);
 
   return (
     <View style={styles.screen}>
       {isLoading && <Spinner />}
       {!events.length && !isLoading && (
         <View style={styles.textContainer}>
-          <Text style={styles.text}>
-            There are currently no events to discover
-          </Text>
+          <Text style={styles.text}>There are no events to discover</Text>
         </View>
       )}
       <ScrollView>
@@ -102,11 +135,13 @@ export const DiscoverEvents = (props: Props) => {
               </Pressable>
             );
           })}
-          <Pagination
-            totalItems={totalEvents}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-          />
+          {!!events.length && (
+            <Pagination
+              totalItems={totalEvents}
+              filter={filters}
+              setFilter={setFilters}
+            />
+          )}
         </View>
       </ScrollView>
       <NavigationBar navigation={props.navigation} />

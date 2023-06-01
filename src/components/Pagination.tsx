@@ -1,9 +1,10 @@
 import { StyleSheet, View, Pressable, Text, Image } from "react-native";
+import { Filter } from "../screens/discoverEvents/DiscoverEvents";
 
 interface Props {
   totalItems: number;
-  currentPage: number;
-  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+  filter: Filter;
+  setFilter: React.Dispatch<React.SetStateAction<Filter>>;
 }
 
 export const Pagination = (props: Props) => {
@@ -15,19 +16,23 @@ export const Pagination = (props: Props) => {
       pages.push(i);
     }
   } else {
-    if (props.currentPage <= 2) {
+    if (props.filter.currentPage <= 2) {
       for (let i = 1; i <= 4; i++) {
         pages.push(i);
       }
       pages.push(totalPages);
-    } else if (props.currentPage >= totalPages - 1) {
+    } else if (props.filter.currentPage >= totalPages - 1) {
       pages.push(1);
       for (let i = totalPages - 3; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
       pages.push(1);
-      for (let i = props.currentPage - 1; i <= props.currentPage + 1; i++) {
+      for (
+        let i = props.filter.currentPage - 1;
+        i <= props.filter.currentPage + 1;
+        i++
+      ) {
         pages.push(i);
       }
       pages.push(totalPages);
@@ -38,13 +43,16 @@ export const Pagination = (props: Props) => {
     <View style={styles.container}>
       <Pressable
         style={
-          props.currentPage === 1
+          props.filter.currentPage === 1
             ? { ...styles.circle, ...styles.currentPageColor }
             : { ...styles.circle, ...styles.notCurrentPageColor }
         }
         onPress={() => {
-          if (props.currentPage != 1) {
-            props.setCurrentPage(props.currentPage - 1);
+          if (props.filter.currentPage != 1) {
+            props.setFilter({
+              currentPage: props.filter.currentPage - 1,
+              searchString: props.filter.searchString,
+            });
           }
         }}
       >
@@ -58,11 +66,16 @@ export const Pagination = (props: Props) => {
           <Pressable
             key={`page-${index}`}
             style={
-              props.currentPage === page
+              props.filter.currentPage === page
                 ? { ...styles.circle, ...styles.currentPageColor }
                 : { ...styles.circle, ...styles.notCurrentPageColor }
             }
-            onPress={() => props.setCurrentPage(page)}
+            onPress={() =>
+              props.setFilter({
+                currentPage: page,
+                searchString: props.filter.searchString,
+              })
+            }
           >
             <Text style={styles.text}>{page}</Text>
           </Pressable>
@@ -70,13 +83,16 @@ export const Pagination = (props: Props) => {
       })}
       <Pressable
         style={
-          props.currentPage === totalPages
+          props.filter.currentPage === totalPages
             ? { ...styles.circle, ...styles.currentPageColor }
             : { ...styles.circle, ...styles.notCurrentPageColor }
         }
         onPress={() => {
-          if (props.currentPage != totalPages) {
-            props.setCurrentPage(props.currentPage + 1);
+          if (props.filter.currentPage != totalPages) {
+            props.setFilter({
+              currentPage: props.filter.currentPage + 1,
+              searchString: props.filter.searchString,
+            });
           }
         }}
       >
