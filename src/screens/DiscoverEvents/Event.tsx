@@ -100,7 +100,6 @@ export const Event = (props: Props) => {
       const assetIds = await getAssetIdsFromAccount(algorandAddress);
       await new Promise((f) => setTimeout(f, 1000));
       assetReceivedCount++;
-      console.log(assetReceivedCount);
       if (assetIds.includes(ticketEventAssetId.assetId)) {
         assetReceivedCount = 10;
       }
