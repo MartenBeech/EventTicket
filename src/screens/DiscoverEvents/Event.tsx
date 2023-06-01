@@ -93,7 +93,19 @@ export const Event = (props: Props) => {
       setIsLoading(false);
       return;
     }
-    await new Promise((f) => setTimeout(f, 5000));
+
+    const algorandAddress = (await getStoreValue(key_address)) as string;
+    let assetReceivedCount = 0;
+    do {
+      const assetIds = await getAssetIdsFromAccount(algorandAddress);
+      await new Promise((f) => setTimeout(f, 1000));
+      assetReceivedCount++;
+      console.log(assetReceivedCount);
+      if (assetIds.includes(ticketEventAssetId.assetId)) {
+        assetReceivedCount = 10;
+      }
+    } while (assetReceivedCount < 10);
+
     setIsLoading(false);
     props.navigation.navigate("MyTickets", {
       snackbarText: "Successfully bought ticket",

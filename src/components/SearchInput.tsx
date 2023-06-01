@@ -1,4 +1,4 @@
-import { StyleSheet, TextInput, View, Text } from "react-native";
+import { StyleSheet, TextInput, View } from "react-native";
 
 interface Props {
   setState?: React.Dispatch<React.SetStateAction<string>>;
