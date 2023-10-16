@@ -13,6 +13,7 @@ import {
   indexerUrl,
   purestakeAPIKey,
   purestakeBaseServer,
+  smartContractAccountAddr,
   walletAddress,
   walletMnemonic,
 } from "../../env";
@@ -91,6 +92,56 @@ export const createTransaction = async (props: CreateTransactionProps) => {
       }
     );
     console.log(`Transaction sent:`);
+    console.log(txId);
+    return true;
+  } catch (err) {
+    if (axios.isAxiosError(err)) {
+      console.log("Axios request failed", err.response?.data, err.toJSON());
+    } else {
+      console.error(err);
+    }
+    return false;
+  }
+};
+
+// Used for delete
+export const optOutOfAsset = async (assetId: number) => {
+  const transactionParams = await getTransactionParams();
+  const algorandAddress = await getStoreValue(key_address);
+  const mnemonic = await getStoreValue(key_mnemonic);
+
+  //Opt out is apprently the same as opting in, except you add the closeRemainderTo field,
+  // and put in the asset creators account address. (In other words, sends the asset back)
+
+  const txn: TransactionLike = {
+    type: TransactionType.axfer,
+    flatFee: true,
+    from: algorandAddress,
+    to: smartContractAccountAddr,
+    fee: transactionParams["min-fee"],
+    amount: 0,
+    closeRemainderTo: smartContractAccountAddr,
+    firstRound: transactionParams["last-round"] + 1,
+    lastRound: transactionParams["last-round"] + 1000,
+    genesisID: transactionParams["genesis-id"],
+    genesisHash: transactionParams["genesis-hash"],
+    assetIndex: assetId,
+  };
+
+  const account = algosdk.mnemonicToSecretKey(mnemonic);
+  const signedTxn = algosdk.signTransaction(txn, account.sk);
+  try {
+    const { data: txId } = await axios.post(
+      `${purestakeBaseServer}/transactions`,
+      signedTxn.blob,
+      {
+        headers: {
+          "Content-Type": "application/x-binary",
+          "X-API-key": purestakeAPIKey,
+        },
+      }
+    );
+    console.log("Transaction sent:");
     console.log(txId);
     return true;
   } catch (err) {
@@ -286,7 +337,7 @@ export const getTotalFromAsset = async (assetId: number): Promise<number> => {
   return -1;
 };
 
-export const getAlgoTransaction = async () => {
+export const transferAlgoToNewser = async () => {
   const transactionParams = await getTransactionParams();
   const algorandAddress = await getStoreValue(key_address);
   const mnemonic = walletMnemonic;
@@ -317,7 +368,7 @@ export const getAlgoTransaction = async () => {
         },
       }
     );
-    console.log(`getAlgoTransaction:`);
+    console.log(`Transfer algo to new user:`);
     console.log(txId);
     return true;
   } catch (err) {

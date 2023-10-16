@@ -16,7 +16,7 @@ interface Props {
   setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const VerifyTicket = (props: Props) => {
+export const VerifyTicketModal = (props: Props) => {
   const [signedMessage, setSignedMessage] = useState<SignedMessage>({
     message: new Uint8Array(),
     publicKey: "",

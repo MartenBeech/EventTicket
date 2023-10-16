@@ -30,6 +30,7 @@ export const MyTickets = (props: Props) => {
       setSnackBarText(props.route.params.snackbarText);
       const getMyAssets = async () => {
         setIsLoading(true);
+        console.log("here ????");
         const algorandAddress = (await getStoreValue(key_address)) as string;
         const assetIds = await getAssetIdsFromAccount(algorandAddress);
         const assets = await Promise.all(

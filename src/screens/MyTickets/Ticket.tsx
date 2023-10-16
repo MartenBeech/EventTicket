@@ -11,12 +11,20 @@ import { RootStackParamList } from "../../Navigation";
 import { smartContractAccountAddr } from "../../../env";
 import {
   getAssetAmountFromAccount,
+  getAssetIdsFromAccount,
   getTotalFromAsset,
+  optOutOfAsset,
 } from "../../rest/algorand";
 import { useEffect, useState } from "react";
-import { VerifyTicket } from "../../components/VerifyTicketModal";
+import { VerifyTicketModal } from "../../components/VerifyTicketModal";
 import { useIsFocused } from "@react-navigation/native";
 import { getFileFromPinata } from "../../rest/ipfs";
+import { Modal } from "react-native-paper";
+import { DeleteConfirmationModal } from "../../components/DeleteConfirmationModal";
+import { SnackbarColor } from "../../components/Snackbar";
+import { Spinner } from "../../components/Spinner";
+import { getStoreValue } from "../../store";
+import { key_address } from "../../constants";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "Ticket">;
 
 interface Props {
@@ -27,13 +35,46 @@ interface Props {
 export const Ticket = (props: Props) => {
   const [ticketsLeft, setTicketsLeft] = useState(0);
   const [ticketsSold, setTicketsSold] = useState(0);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [verifyModalVisible, setVerifyModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [image, setImage] = useState("");
+  const [snackBarText, setSnackBarText] = useState("");
+  const [snackBarColor, setSnackBarColor] = useState<SnackbarColor>("green");
+  const [isLoading, setIsLoading] = useState(false);
 
   const ticketEventAssetId = props.route.params.ticketEventAssetId;
   const ticketEvent = ticketEventAssetId.ticketEvent;
 
   const isFocused = useIsFocused();
+
+  const deleteTicket = async () => {
+    setIsLoading(true);
+    const optInAssetResult = await optOutOfAsset(ticketEventAssetId.assetId);
+    if (!optInAssetResult) {
+      setSnackBarColor("red");
+      setSnackBarText("Failed to opt in asset");
+      setIsLoading(false);
+      return;
+    }
+
+    const algorandAddress = (await getStoreValue(key_address)) as string;
+    let assetReceivedCount = 0;
+    do {
+      const assetIds = await getAssetIdsFromAccount(algorandAddress);
+      await new Promise((f) => setTimeout(f, 1000));
+      assetReceivedCount++;
+      console.log(assetReceivedCount);
+      // We need to check that we don't have it anymore
+      if (!assetIds.includes(ticketEventAssetId.assetId)) {
+        assetReceivedCount = 10;
+      }
+    } while (assetReceivedCount < 10);
+
+    setIsLoading(false);
+    props.navigation.navigate("MyTickets", {
+      snackbarText: "Successfully Delete Ticket",
+    });
+  };
 
   useEffect(() => {
     if (isFocused) {
@@ -55,8 +96,11 @@ export const Ticket = (props: Props) => {
 
   return (
     <View style={styles.screen}>
+      {isLoading && <Spinner />}
       <ScrollView>
-        {modalVisible && <VerifyTicket setModalVisible={setModalVisible} />}
+        {verifyModalVisible && (
+          <VerifyTicketModal setModalVisible={setVerifyModalVisible} />
+        )}
 
         <Image
           style={styles.image}
@@ -66,6 +110,11 @@ export const Ticket = (props: Props) => {
               : require("../../images/ImagePlaceholder.jpg")
           }
         />
+        <DeleteConfirmationModal
+          isVisible={deleteModalVisible}
+          onCancel={() => setDeleteModalVisible(false)}
+          onConfirm={async () => await deleteTicket()}
+        ></DeleteConfirmationModal>
         <View style={styles.container}>
           <View style={styles.titleContainer}>
             <Text style={styles.title}>{ticketEvent.title}</Text>
@@ -85,9 +134,9 @@ export const Ticket = (props: Props) => {
             </Text>
           </View>
           <Pressable
-            style={styles.verifyTicketButton}
+            style={[styles.verifyTicketButton, styles.buttonStyling]}
             onPress={async () => {
-              setModalVisible(true);
+              setVerifyModalVisible(true);
             }}
           >
             <Text style={styles.buyTicketText}>Verify Ticket</Text>
@@ -100,6 +149,14 @@ export const Ticket = (props: Props) => {
               {ticketsSold} tickets sold
             </Text>
           </View>
+          <Pressable
+            style={[styles.deleteTicketButton, styles.buttonStyling]}
+            onPress={async () => {
+              setDeleteModalVisible(true);
+            }}
+          >
+            <Text style={styles.buyTicketText}>Delete Ticket</Text>
+          </Pressable>
         </View>
       </ScrollView>
     </View>
@@ -147,9 +204,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   verifyTicketButton: {
+    backgroundColor: "#0D8200",
+  },
+  deleteTicketButton: {
+    backgroundColor: "#F91130",
+  },
+  buttonStyling: {
     height: 50,
     width: "100%",
-    backgroundColor: "#0D8200",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 15,
