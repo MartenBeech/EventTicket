@@ -337,7 +337,7 @@ export const getTotalFromAsset = async (assetId: number): Promise<number> => {
   return -1;
 };
 
-export const transferAlgoToNewser = async () => {
+export const transferAlgoToNewUser = async () => {
   const transactionParams = await getTransactionParams();
   const algorandAddress = await getStoreValue(key_address);
   const mnemonic = walletMnemonic;

@@ -8,7 +8,7 @@ import {
   TextInput,
 } from "react-native";
 import { key_mnemonic, key_username } from "../constants";
-import { createAccount, transferAlgoToNewser } from "../rest/algorand";
+import { createAccount, transferAlgoToNewUser } from "../rest/algorand";
 import { getStoreValue, setStorePair } from "../store";
 
 export const IdentifierModal = () => {
@@ -48,7 +48,7 @@ export const IdentifierModal = () => {
               } else {
                 await createAccount();
                 setStorePair(key_username, username);
-                transferAlgoToNewser();
+                transferAlgoToNewUser();
 
                 setModalVisible(false);
               }
