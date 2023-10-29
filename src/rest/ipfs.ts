@@ -14,7 +14,7 @@ export const getIPFSEventData = async (url: string) => {
     title: "",
   };
   try {
-    const response = await axios.get(`${IPFSUrlPrefix}/${url}`);
+    const response = await axios.get(`${IPFSUrlPrefix}${url}`);
     const data = response.data;
     if (data) {
       returnData = data;
@@ -33,7 +33,7 @@ export const getFileFromPinata = async (IpfsHash: string) => {
   if (!IpfsHash) {
     return "";
   }
-  const response = await fetch(`${IPFSUrlPrefix}/ipfs/${IpfsHash}`);
+  const response = await fetch(`${IPFSUrlPrefix}ipfs/${IpfsHash}`);
   const data = await response.json();
   const file = `data:image;base64,${data.file}`;
   return file;
