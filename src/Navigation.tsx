@@ -4,10 +4,12 @@ import { MyTickets } from "./screens/myTickets/MyTickets";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Event } from "./screens/discoverEvents/Event";
 import { Ticket } from "./screens/myTickets/Ticket";
-import { View } from "react-native";
 import { IdentifierModal } from "./components/IdentifierModal";
 import { TicketEventAssetId } from "./entities/event";
 import { SearchInput } from "./components/SearchInput";
+import { AccountButton } from "./components/AccountButton";
+import { AccountModal } from "./components/AccountModal";
+import { useState } from "react";
 
 export type RootStackParamList = {
   DiscoverEvents: undefined;
@@ -19,8 +21,14 @@ export type RootStackParamList = {
 const RootStack = createStackNavigator<RootStackParamList>();
 
 export const Navigation = () => {
+  const [accountModalVisible, setAccountModalVisible] = useState(false);
+
   return (
     <NavigationContainer>
+      <AccountModal
+        isVisible={accountModalVisible}
+        onClose={() => setAccountModalVisible(false)}
+      />
       <IdentifierModal />
       <RootStack.Navigator>
         <RootStack.Screen
@@ -29,9 +37,9 @@ export const Navigation = () => {
           initialParams={undefined}
           options={{
             title: "",
-            headerLeft: () => {
-              return <View></View>;
-            },
+            headerLeft: () => (
+              <AccountButton onPress={() => setAccountModalVisible(true)} />
+            ),
             headerRight: () => <SearchInput />,
           }}
         />
@@ -41,9 +49,9 @@ export const Navigation = () => {
           initialParams={{ snackbarText: "" }}
           options={{
             title: "",
-            headerLeft: () => {
-              return <View></View>;
-            },
+            headerLeft: () => (
+              <AccountButton onPress={() => setAccountModalVisible(true)} />
+            ),
           }}
         />
         <RootStack.Screen

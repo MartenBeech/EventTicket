@@ -22,7 +22,7 @@ export const SearchInput = (props: Props) => {
 };
 
 const styles = StyleSheet.create({
-  container: { width: "40%", marginHorizontal: "5%", marginVertical: 10 },
+  container: { width: 150, marginRight: 18 },
   text: {
     fontSize: 10,
   },

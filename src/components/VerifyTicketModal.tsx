@@ -13,7 +13,7 @@ import { signMessage } from "../algorand/messageHandler";
 import { SignedMessage } from "../entities/signedMessage";
 
 interface Props {
-  setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  onClose: () => void;
 }
 
 export const VerifyTicketModal = (props: Props) => {
@@ -41,14 +41,14 @@ export const VerifyTicketModal = (props: Props) => {
       transparent={true}
       visible={true}
       onRequestClose={() => {
-        props.setModalVisible(false);
+        props.onClose();
       }}
     >
       <TouchableOpacity
         style={styles.screen}
         activeOpacity={1}
         onPressOut={() => {
-          props.setModalVisible(false);
+          props.onClose();
         }}
       >
         <View style={styles.centeredView}>

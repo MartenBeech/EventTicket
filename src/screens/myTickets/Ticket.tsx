@@ -99,7 +99,7 @@ export const Ticket = (props: Props) => {
       {isLoading && <Spinner />}
       <ScrollView>
         {verifyModalVisible && (
-          <VerifyTicketModal setModalVisible={setVerifyModalVisible} />
+          <VerifyTicketModal onClose={() => setVerifyModalVisible(false)} />
         )}
 
         <Image

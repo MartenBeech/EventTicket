@@ -54,7 +54,7 @@ export const IdentifierModal = () => {
               }
             }}
           >
-            <Text style={styles.submitText}>Submit</Text>
+            <Text>Submit</Text>
           </Pressable>
         </View>
       </View>
@@ -106,5 +106,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#45c458",
   },
-  submitText: {},
 });
