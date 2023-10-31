@@ -11,7 +11,10 @@ import { TicketEventAssetId } from "../../entities/event";
 import { useIsFocused } from "@react-navigation/native";
 import { Spinner } from "../../components/Spinner";
 import { Pagination } from "../../components/Pagination";
-import { convertDateMonthYearToUTC } from "../../services/dateTime";
+import {
+  convertDateMonthYearToUTC,
+  isDateAfterNow,
+} from "../../services/dateTime";
 import { filterItemsForPage } from "../../services/filterItemsForPage";
 import { SearchInput } from "../../components/SearchInput";
 import { useDebouncedCallback } from "use-debounce";
@@ -73,8 +76,11 @@ export const DiscoverEvents = (props: Props) => {
                   .includes(filters.searchString.toLocaleLowerCase())
             )
           : events;
-        setTotalEvents(searchFilteredEvents.length);
-        const sortedEvents = searchFilteredEvents.sort((a, b) => {
+        const activeEvents = searchFilteredEvents.filter((event) =>
+          isDateAfterNow(event.ticketEvent.endDate)
+        );
+        setTotalEvents(activeEvents.length);
+        const sortedEvents = activeEvents.sort((a, b) => {
           return convertDateMonthYearToUTC(a.ticketEvent.startDate) >
             convertDateMonthYearToUTC(b.ticketEvent.startDate)
             ? 1
