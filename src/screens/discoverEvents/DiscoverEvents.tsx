@@ -73,6 +73,9 @@ export const DiscoverEvents = (props: Props) => {
                   .includes(filters.searchString.toLocaleLowerCase()) ||
                 event.ticketEvent.location
                   .toLocaleLowerCase()
+                  .includes(filters.searchString.toLocaleLowerCase()) ||
+                event.ticketEvent.description
+                  .toLocaleLowerCase()
                   .includes(filters.searchString.toLocaleLowerCase())
             )
           : events;
