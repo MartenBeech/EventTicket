@@ -1,8 +1,7 @@
-import { StyleSheet, View, ScrollView, Pressable, Text } from "react-native";
+import { StyleSheet, View, ScrollView, Text } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Navigation";
 import { NavigationBar } from "../../NavigationBar";
-import { EventBox } from "../../components/EventBox";
 import { getAssetIdsFromAccount, getUrlFromAssetId } from "../../rest/algorand";
 import { useEffect, useState } from "react";
 import { getIPFSEventData } from "../../rest/ipfs";
@@ -12,6 +11,7 @@ import { key_address } from "../../constants";
 import { useIsFocused } from "@react-navigation/native";
 import { Spinner } from "../../components/Spinner";
 import { Snackbar } from "../../components/Snackbar";
+import { EventCard } from "../../components/EventCard";
 type NavigationRoute = NativeStackScreenProps<RootStackParamList, "MyTickets">;
 
 interface Props {
@@ -67,27 +67,20 @@ export const MyTickets = (props: Props) => {
       )}
       <ScrollView>
         <View style={styles.container}>
-          {events.map((event, index) => {
-            const ticketEvent = event.ticketEvent;
-            return (
-              <Pressable
-                key={`${ticketEvent.title}-${index}`}
-                style={styles.button}
-                onPress={() => {
-                  props.navigation.navigate("Ticket", {
-                    ticketEventAssetId: { ticketEvent, assetId: event.assetId },
-                  });
-                }}
-              >
-                <EventBox
-                  imageUrl={`${ticketEvent.imageUrl}`}
-                  title={ticketEvent.title}
-                  date={ticketEvent.startDate}
-                  location={ticketEvent.location}
-                />
-              </Pressable>
-            );
-          })}
+          {events.map((event, index) => (
+            <EventCard
+              event={event.ticketEvent}
+              key={`EventCard-${index}`}
+              onPress={() => {
+                props.navigation.navigate("Ticket", {
+                  ticketEventAssetId: {
+                    ticketEvent: event.ticketEvent,
+                    assetId: event.assetId,
+                  },
+                });
+              }}
+            />
+          ))}
         </View>
       </ScrollView>
       <NavigationBar navigation={props.navigation} />

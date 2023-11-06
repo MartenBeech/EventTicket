@@ -1,8 +1,7 @@
-import { StyleSheet, View, ScrollView, Pressable, Text } from "react-native";
+import { StyleSheet, View, ScrollView, Text } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../Navigation";
 import { NavigationBar } from "../../NavigationBar";
-import { EventBox } from "../../components/EventBox";
 import { getAssetIdsFromAccount, getUrlFromAssetId } from "../../rest/algorand";
 import { smartContractAccountAddr } from "../../../env";
 import { useEffect, useState } from "react";
@@ -18,6 +17,7 @@ import {
 import { filterItemsForPage } from "../../services/filterItemsForPage";
 import { SearchInput } from "../../components/SearchInput";
 import { useDebouncedCallback } from "use-debounce";
+import { EventCard } from "../../components/EventCard";
 type NavigationRoute = NativeStackScreenProps<
   RootStackParamList,
   "DiscoverEvents"
@@ -117,30 +117,20 @@ export const DiscoverEvents = (props: Props) => {
       )}
       <ScrollView>
         <View style={styles.container}>
-          {events.map((event, index) => {
-            const ticketEvent = event.ticketEvent;
-            return (
-              <Pressable
-                key={`${ticketEvent.title}-${index}`}
-                style={styles.button}
-                onPress={() => {
-                  props.navigation.navigate("Event", {
-                    ticketEventAssetId: {
-                      ticketEvent,
-                      assetId: event.assetId,
-                    },
-                  });
-                }}
-              >
-                <EventBox
-                  imageUrl={ticketEvent.imageUrl}
-                  title={ticketEvent.title}
-                  date={ticketEvent.startDate}
-                  location={ticketEvent.location}
-                />
-              </Pressable>
-            );
-          })}
+          {events.map((event, index) => (
+            <EventCard
+              event={event.ticketEvent}
+              key={`EventCard-${index}`}
+              onPress={() => {
+                props.navigation.navigate("Event", {
+                  ticketEventAssetId: {
+                    ticketEvent: event.ticketEvent,
+                    assetId: event.assetId,
+                  },
+                });
+              }}
+            />
+          ))}
           {!!events.length && (
             <Pagination
               totalItems={totalEvents}
